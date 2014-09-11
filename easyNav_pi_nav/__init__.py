@@ -15,7 +15,7 @@ logging.getLogger('').handlers = []
 logging.basicConfig(
     # filename = "a.log",
     # filemode="w",
-    level = logging.DEBUG)
+    level = logging.INFO)
 
 
 from easyNav_pi_nav.version import __version__

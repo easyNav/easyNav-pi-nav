@@ -34,6 +34,10 @@ class NavTestCase(TestCase):
 		testStr = r.text
 		cls.pt = Point(testStr)
 		logging.info('Generated new point.')
+
+		r2 = requests.get('http://localhost:1337/node/?SUID=3') 
+		testStr2 = r2.text
+		cls.pt2 = Point(testStr2)
 		pass
 
 	@classmethod
@@ -66,6 +70,22 @@ class NavTestCase(TestCase):
 		pass
 
 	def test_can_return_distance_to_another_point(self):
+		distance = self.pt.distTo(self.pt2)
+		expect(distance).to_be_numeric()
+		expect(distance).to_be_greater_than(0)
+		pass
+
+	def test_can_determine_if_target_pt_is_near(self):
+		expect( self.pt.near(self.pt, 20) ).to_be_true()
+		expect( self.pt.near(self.pt2, 20) ).to_be_false()
+		expect( self.pt.near(self.pt2, 1000) ).to_be_true()
+
+	def test_can_retrieve_internal_orientation(self):
+		expect(self.pt.angle()).to_be_numeric()
+
+	def test_can_retrieve_orientation_from_another_pt(self):
+		print("----------ANGLE-----------")
+		print ( self.pt.angleTo(self.pt2) )
 		pass
 
 
