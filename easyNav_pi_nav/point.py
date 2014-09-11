@@ -9,7 +9,9 @@ import numpy
 class Point(object):
 
 
-	# Private variables
+	# proximity enumeration constants
+	REACHED, FAR, MOVE_FORWARD, ALIGNED, TURN_LEFT, TURN_RIGHT = range(6)
+
 
 
 	# "x" : 0, "y": 0, "z": 0 
@@ -110,6 +112,8 @@ class Point(object):
 	def angleTo(self, targetPt):
 		"""Returns the orientation of the point, with respect to another point.  
 		Measurement given from north.
+		The assumption is (0,0) starts from the top-left corner of screen, and
+		increases downwards, rightwards.
 		"""
 		loc_a = self.loc() 
 		loc_b = targetPt.loc() 
@@ -117,20 +121,36 @@ class Point(object):
 		cX = loc_b['x'] - loc_a['x']
 		cY = loc_b['y'] - loc_a['y']
 
+		# This means point is very near; do not bother!!
+		if (cX == cY == 0):
+			return 0
+
+
+		# Watch for dividing by 0 case
+		if (cY == 0):
+			if (cX >= 0): 
+				theta = numpy.pi / 2
+				return theta
+			else:
+				theta = 3 / 2 * numpy.pi
+				return theta
+
+		# Do actual calculation
 		theta = numpy.arctan(abs(cX / cY))
 
-		if ( (cX > 0) and (cY > 0) ):
+		if ( (cX > 0) and (cY < 0) ):
 			theta = theta
 
-		elif ( (cX > 0) and (cY < 0) ):
+		elif ( (cX > 0) and (cY > 0) ):
 			theta = numpy.pi - theta
 
-		elif ( (cX < 0) and (cY < 0) ):
+		elif ( (cX < 0) and (cY > 0) ):
 			theta = numpy.pi + theta
 
 		else:
 			theta = 2 * numpy.pi - theta
 
+		logging.debug('[angleTo, deg]:: {}'.format(numpy.rad2deg(theta)) )
 		return theta
 
 
@@ -138,14 +158,77 @@ class Point(object):
 		""" Determines if point is near target
 		"""
 		distance = self.distTo(targetPt)
-		return (distance < threshold)
-
-
-	def feedback(self, targetPt, threshold):
+		if (distance < threshold):
+			return Point.REACHED
+		else:
+			return Point.FAR
 		pass
 
-	def nearPath(self, pt1, pt2, threshold):
+
+	def angleDiff(self, targetPt):
+		""" Determines if point orientation is towards target
+		positive: needs to move clockwise for correction to target
+		negative: needs to move counter-clockwise for correction to target
+
+		"""
+		return self.angleTo(targetPt) - self.angle()
+
+
+	def angleNear(self, targetPt, threshold):
+		""" Determines if point orientation is aligned to target 
+		"""
+		angleCorrection = self.angleDiff(targetPt)
+		if (angleCorrection < (-threshold) ):
+			return Point.TURN_LEFT
+		elif (threshold < angleCorrection):
+			return Point.TURN_RIGHT
+		else:
+			return Point.ALIGNED
 		pass
+
+
+
+	def feedback(self, targetPt, thresholdDist, thresholdAngle):
+		""" Returns feedback for route.
+		Orientation takes precedence over distance to target, hence 
+		this will be corrected first.
+		"""
+		response = {
+			"status": Point.FAR,
+			"distance": self.distTo(targetPt),
+			"angleCorrection": self.angleDiff(targetPt)
+		}
+
+		turningCorrection = self.angleNear(targetPt, thresholdAngle)
+
+		if (turningCorrection is Point.TURN_LEFT):
+			response["status"] = Point.TURN_LEFT
+
+		elif (turningCorrection is Point.TURN_RIGHT):
+			response["status"] = Point.TURN_RIGHT
+
+		elif ( self.near(targetPt, thresholdDist) is Point.FAR):
+			response["status"] = Point.MOVE_FORWARD
+
+		else:
+			response["status"] = Point.REACHED
+
+		return response
+
+
+	def distToPath(self, point1, point2):
+		""" Determines distance from line of path, given
+		by two points.
+		"""
+		ptA = self.loc()
+		ptB = point1.loc()
+		ptC = point2.loc()
+		
+		vecAB = numpy.array([ ptB['x'] - ptA['x'], ptB['y'] - ptA['y'] ])
+		vecV = numpy.array([ -(ptB['x'] - ptC['x']), ptB['x'] - ptC['y'] ])
+		vecVUnit = numpy.multiply(1 / numpy.linalg.norm(vecV), vecV)
+		result = numpy.linalg.norm( numpy.vdot(vecVUnit, vecAB) )
+		return result
 
 
 

@@ -76,19 +76,42 @@ class NavTestCase(TestCase):
 		pass
 
 	def test_can_determine_if_target_pt_is_near(self):
-		expect( self.pt.near(self.pt, 20) ).to_be_true()
-		expect( self.pt.near(self.pt2, 20) ).to_be_false()
-		expect( self.pt.near(self.pt2, 1000) ).to_be_true()
+		expect( self.pt.near(self.pt, 20) ).to_equal(Point.REACHED)
+		expect( self.pt.near(self.pt2, 20) ).to_equal(Point.FAR)
+		expect( self.pt.near(self.pt2, 1000) ).to_equal(Point.REACHED)
 
 	def test_can_retrieve_internal_orientation(self):
 		expect(self.pt.angle()).to_be_numeric()
 
 	def test_can_retrieve_orientation_from_another_pt(self):
-		print("----------ANGLE-----------")
-		print ( self.pt.angleTo(self.pt2) )
+		## TODO: Write more tests for this test orientation
+		angleTo = self.pt.angleTo(self.pt2)
+		expect(angleTo).to_be_numeric()
+
+		# if point is very near / exactly the same point, give a zero.
+		angleTo = self.pt.angleTo(self.pt)
+		expect(angleTo).to_equal(0)
+
+	def test_target_point_angle_is_near_or_aligned(self):
+		result = self.pt.angleNear(self.pt2, 0.17453)
+		expect(result).Not.to_equal(Point.ALIGNED)
+
+		result = self.pt.angleNear(self.pt, 0.17453)
+		expect(result).to_equal(Point.ALIGNED)
+
+	def test_feedback_correction_is_working(self):
+		thresholdDist, thresholdAngle  = 10, 0.17453
+		feedback = self.pt.feedback(self.pt2, thresholdDist, thresholdAngle)
+		expect(feedback['status']).to_equal(Point.TURN_RIGHT)
+
+	def test_distance_to_line_path_works(self):
+		"""Determines distance of point from pathway between 2 lines
+		"""
+		## TODO: Test, fix and implement this into feedback()
+		r = requests.get('http://localhost:1337/node/?SUID=7') 
+		testStr = r.text
+		pt3 = Point(testStr)
+		distance = pt3.distToPath(self.pt, self.pt2)
+		# logging.info('----------------------------------------------{}'.format(distance))
 		pass
-
-
-
-		# expect(bla.area()).to_equal(5)
 
