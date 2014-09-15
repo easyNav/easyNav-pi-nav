@@ -32,12 +32,12 @@ class NavTestCase(TestCase):
 
 		r = requests.get('http://localhost:1337/node/?SUID=1') 
 		testStr = r.text
-		cls.pt = Point(testStr)
+		cls.pt = Point.fromJson(testStr)
 		logging.info('Generated new point.')
 
 		r2 = requests.get('http://localhost:1337/node/?SUID=3') 
 		testStr2 = r2.text
-		cls.pt2 = Point(testStr2)
+		cls.pt2 = Point.fromJson(testStr2)
 		pass
 
 	@classmethod
@@ -110,7 +110,7 @@ class NavTestCase(TestCase):
 		## TODO: Test, fix and implement this into feedback()
 		r = requests.get('http://localhost:1337/node/?SUID=7') 
 		testStr = r.text
-		pt3 = Point(testStr)
+		pt3 = Point.fromJson(testStr)
 		distance = pt3.distToPath(self.pt, self.pt2)
 		# logging.info('----------------------------------------------{}'.format(distance))
 		pass

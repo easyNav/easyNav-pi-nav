@@ -17,8 +17,11 @@ class Point(object):
 	# "x" : 0, "y": 0, "z": 0 
 
 
-	def __init__(self, jsonPt):
-		"""Creates a point, from a JSON-style string. 
+	def __init__(self, inputDict):
+		"""Creates a point, from a dictionary. 
+			To instantiate, do something like:
+			
+				pt = Point.fromJson(jsonStringHere)
 
 		Args: 
 			jsonPt: A JSON-style string to parse.  Must be of the ODM format specified 
@@ -31,32 +34,58 @@ class Point(object):
 			None
 
 		"""
-
-		# internal variables --------------
 		self.__model = {
-			"location" : 0,
-			"orientation" : 0,
-			"name" : "",
-			"SUID" : "",
-			"key" : ""
+			"loc" : inputDict["loc"],
+			"orientation" : inputDict["orientation"],
+			"name" : inputDict["name"],
+			"SUID" : inputDict["SUID"],
+			"id" : inputDict["id"]
 		}
-		#----------------------------------
 
-		super(Point, self).__init__()
+		# super(Point, self).__init__()
+		return
+
+
+	@classmethod
+	def fromParam(cls, x=0, y=0, z=0, orientation=0, name="", suid="", id=""):
+		""" Easy method to create points for testing.
+		"""
 		data = json.loads(jsonPt)[0]
-		self.__model["name"] = data.get("name")
-		self.__model["orientation"] = data.get("orientation", 0)
-		self.__model["loc"] = json.loads(data.get("loc"))
-		self.__model["SUID"] = data.get("SUID")
-		self.__model["id"] = data.get("id")
+		result = {}
+		result["name"] = name
+		result["orientation"] = orientation
+		result["loc"] = {
+			"x" : x,
+			"y" : y, 
+			"z" : z
+		}
+		result["SUID"] = suid
+		result["id"] = id
+		return cls(result)
+
+
+
+	@classmethod
+	def fromJson(cls, jsonPt):
+		""" Creates a point, from a JSON.
+		"""
+		data = json.loads(jsonPt)[0]
+		result = {}
+		result["name"] = data.get("name")
+		result["orientation"] = data.get("orientation", 0)
+		result["loc"] = json.loads(data.get("loc"))
+		result["SUID"] = data.get("SUID")
+		result["id"] = data.get("id")
 
 		# convert strings to numeric
-		for key in self.__model["loc"]:
-			self.__model["loc"][key] = float(self.__model["loc"][key])
+		for key in result["loc"]:
+			result["loc"][key] = float(result["loc"][key])
 
-		if type(self.__model["orientation"]) is str:
-			self.__model["orientation"] = float(self.__model["orientation"])
-		return
+		if type(result["orientation"]) is str:
+			result["orientation"] = float(result["orientation"])
+
+		return cls(result)
+
 
 
 	def __str__(self):
