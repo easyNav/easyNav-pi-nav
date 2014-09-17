@@ -69,7 +69,13 @@ class Point(object):
 	def fromJson(cls, jsonPt):
 		""" Creates a point, from a JSON.
 		"""
-		data = json.loads(jsonPt)[0]
+		# Ensure all data is a single JSON element
+		tmpData = json.loads(jsonPt)
+		if type(tmpData) is list:
+			data = tmpData[0]
+		else:
+			data = tmpData
+
 		result = {}
 		result["name"] = data.get("name")
 		result["orientation"] = data.get("orientation", 0)
@@ -99,7 +105,7 @@ class Point(object):
 		Raises:
 			None
 		"""
-		pass
+		return str(self.__model)
 
 
 	def toJSON(self):
@@ -258,6 +264,16 @@ class Point(object):
 		vecVUnit = numpy.multiply(1 / numpy.linalg.norm(vecV), vecV)
 		result = numpy.linalg.norm( numpy.vdot(vecVUnit, vecAB) )
 		return result
+
+
+	def isEqual(self, point):
+		""" Determines if another point is equal, in value,
+		to the current point. 
+		"""
+		model = self.__model.pop("id", None)
+		model2 = point.__model.pop("id", None)
+
+		return cmp(model, model2) == 0
 
 
 

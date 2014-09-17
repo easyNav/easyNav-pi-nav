@@ -21,3 +21,4 @@ logging.basicConfig(
 from easyNav_pi_nav.version import __version__
 from easyNav_pi_nav.nav import Nav
 from easyNav_pi_nav.point import Point
+from easyNav_pi_nav.path import Path
