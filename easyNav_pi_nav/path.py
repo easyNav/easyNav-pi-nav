@@ -55,6 +55,7 @@ class Path(object):
 
 
 	def isNear(self):
+		## TODO: implement this
 		pass
 
 

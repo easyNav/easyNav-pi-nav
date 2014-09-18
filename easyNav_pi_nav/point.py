@@ -50,7 +50,6 @@ class Point(object):
 	def fromParam(cls, x=0, y=0, z=0, orientation=0, name="", suid="", id=""):
 		""" Easy method to create points for testing.
 		"""
-		data = json.loads(jsonPt)[0]
 		result = {}
 		result["name"] = name
 		result["orientation"] = orientation
@@ -255,6 +254,7 @@ class Point(object):
 		""" Determines distance from line of path, given
 		by two points.
 		"""
+		## TODO: Test and fix this function.
 		ptA = self.loc()
 		ptB = point1.loc()
 		ptC = point2.loc()

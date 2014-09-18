@@ -48,9 +48,25 @@ class PathTestCase(TestCase):
 	def teardown(self):
 		pass
 
+
 	def test_can_instantiate_from_string(self):
 		path = Path.fromString(self.pathNodes)
 		pass
+
+
+	def test_can_instantiate_from_points(self):
+		pointList = []
+		
+		pointList.append(Point.fromParam())
+		pointList.append(Point.fromParam(8, 8, 8))
+		pointList.append(Point.fromParam(21, 32, 63))
+		pointList.append(Point.fromParam(88, 3, 20))
+		pointList.append(Point.fromParam(400, 2, 31))
+		pointList.append(Point.fromParam(200, 0, 0))
+
+		path = Path.fromPoints(pointList)
+		expect(path.length()).to_equal(6)
+
 
 	def test_can_retrieve_length (self):
 		path = Path.fromString(self.pathNodes)
