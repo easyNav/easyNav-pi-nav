@@ -76,9 +76,13 @@ class NavTestCase(TestCase):
 		pass
 
 	def test_can_determine_if_target_pt_is_near(self):
-		expect( self.pt.near(self.pt, 20) ).to_equal(Point.REACHED)
-		expect( self.pt.near(self.pt2, 20) ).to_equal(Point.FAR)
-		expect( self.pt.near(self.pt2, 1000) ).to_equal(Point.REACHED)
+		ptA = Point.fromParam(0,0,0)
+		ptB = Point.fromParam(10, 10, 10)
+		ptC = Point.fromParam(4000, 4000, 4000)
+		expect( ptA.near(ptA, 20) ).to_equal(Point.REACHED)
+		expect( ptA.near(ptC, 20) ).to_equal(Point.FAR)
+		expect( ptA.near(ptC, 20000) ).to_equal(Point.REACHED)
+		expect( ptA.near(ptB, 20) ).to_equal(Point.REACHED)
 
 	def test_can_retrieve_internal_orientation(self):
 		expect(self.pt.angle()).to_be_numeric()
@@ -107,11 +111,26 @@ class NavTestCase(TestCase):
 	def test_distance_to_line_path_works(self):
 		"""Determines distance of point from pathway between 2 lines
 		"""
-		## TODO: Test, fix and implement this into feedback()
-		r = requests.get('http://localhost:1337/node/?SUID=7') 
-		testStr = r.text
-		pt3 = Point.fromJson(testStr)
-		distance = pt3.distToPath(self.pt, self.pt2)
-		# logging.info('----------------------------------------------{}'.format(distance))
+		ptA = Point.fromParam(0,0,0)
+		ptB = Point.fromParam(0, 20, 0)
+
+		pt = Point.fromParam(0,10,0)
+		distance = pt.distToPath(ptA, ptB)
+		expect(distance).to_equal(0)
+
+		pt = Point.fromParam(5,10,0)
+		distance = pt.distToPath(ptA, ptB)
+		expect(distance).to_equal(5)
+
+		pt = Point.fromParam(20,10,0)
+		distance = pt.distToPath(ptA, ptB)
+		expect(distance).to_equal(20)
+
+		pt = Point.fromParam(20,20,0)
+		distance = pt.distToPath(ptA, ptB)
+		expect(distance).to_equal(20)
+
+
+		logging.info('----------------------------------------------{}'.format(distance))
 		pass
 

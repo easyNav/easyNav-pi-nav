@@ -253,16 +253,34 @@ class Point(object):
 	def distToPath(self, point1, point2):
 		""" Determines distance from line of path, given
 		by two points.
+
+		The vector formula imeplented from 
+		http://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line 
 		"""
 		## TODO: Test and fix this function.
-		ptA = self.loc()
-		ptB = point1.loc()
-		ptC = point2.loc()
-		
-		vecAB = numpy.array([ ptB['x'] - ptA['x'], ptB['y'] - ptA['y'] ])
-		vecV = numpy.array([ -(ptB['x'] - ptC['x']), ptB['x'] - ptC['y'] ])
-		vecVUnit = numpy.multiply(1 / numpy.linalg.norm(vecV), vecV)
-		result = numpy.linalg.norm( numpy.vdot(vecVUnit, vecAB) )
+		pt = self.loc()
+		ptA = point1.loc()
+		ptB = point2.loc()
+
+		vecAB = numpy.array([
+			ptB['x'] - ptA['x'],
+			ptB['y'] - ptA['y']
+		 ])
+		vecUnitAB = numpy.multiply( 1 / numpy.linalg.norm(vecAB), vecAB )
+
+		vecA = numpy.array([
+			ptA['x'],
+			ptA['y']
+		])
+
+		vecP = numpy.array([
+			pt['x'],
+			pt['y']
+		])
+
+		part1 = numpy.vdot ( (vecA - vecP), vecUnitAB )
+		vecResult = (vecA - vecP) - (part1 * vecUnitAB)
+		result = numpy.linalg.norm(vecResult)
 		return result
 
 
