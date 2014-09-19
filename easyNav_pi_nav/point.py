@@ -10,7 +10,7 @@ class Point(object):
 
 
 	# proximity enumeration constants
-	REACHED, FAR, MOVE_FORWARD, ALIGNED, TURN_LEFT, TURN_RIGHT = range(6)
+	REACHED, FAR, OUT_OF_PATH, MOVE_FORWARD, ALIGNED, TURN_LEFT, TURN_RIGHT = range(7)
 
 
 
@@ -254,10 +254,16 @@ class Point(object):
 		""" Determines distance from line of path, given
 		by two points.
 
+		If return value is -1, then identitcal points are used and
+		hence result is invalid.
+
 		The vector formula imeplented from 
 		http://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line 
 		"""
 		## TODO: Test and fix this function.
+		if point1.isEqualXYZ( point2 ):
+			return -1 
+
 		pt = self.loc()
 		ptA = point1.loc()
 		ptB = point2.loc()
@@ -292,6 +298,39 @@ class Point(object):
 		model2 = point.__model.pop("id", None)
 
 		return cmp(model, model2) == 0
+
+
+	def isEqualXYZ(self, point):
+		""" Determines if another point is equal, in terms of coordinates,
+		to the current point. 
+		"""
+		x = self.loc()['x'] == point.loc()['x']
+		y = self.loc()['y'] == point.loc()['y']
+		z = self.loc()['z'] == point.loc()['z']
+
+		return x & y & z
+
+
+	def nearPath(self, point1, point2, threshold):
+		""" Determines if near a path. 
+		"""
+		return self.distToPath(point1, point2) <= threshold
+
+
+	def feedbackPath(self, point1, point2, thresholdDist, thresholdAngle):
+		""" Gives feedback on path.  The destination point is point2.
+		"""
+		## Check for valid line first
+		if point1.isEqualXYZ(point2):
+			return -1
+
+		## Check distance from path.  If too far, then is off track.
+		if self.nearPath(point1, point2, thresholdDist) is False:
+			return Point.OUT_OF_PATH
+
+		## Else do normal feedback correction on point2.
+		return self.feedback(point2, thresholdDist, thresholdAngle)
+
 
 
 

@@ -130,7 +130,13 @@ class NavTestCase(TestCase):
 		distance = pt.distToPath(ptA, ptB)
 		expect(distance).to_equal(20)
 
+		# Test for invalid point, which should return -1
+		ptA = Point.fromParam(0,20,0)
+		ptB = Point.fromParam(0, 20, 0)
+		pt = Point.fromParam(20,20,0)
+		distance = pt.distToPath(ptA, ptB)
+		expect(distance).to_equal(-1)
 
-		logging.info('----------------------------------------------{}'.format(distance))
+		# logging.info('----------------------------------------------{}'.format(distance))
 		pass
 

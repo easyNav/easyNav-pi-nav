@@ -100,5 +100,18 @@ class PathTestCase(TestCase):
 		expect(node.isEqual(node4)).to_equal(True)
 		expect(node.isEqual(nodeP)).to_equal(True)
 
+	def test_determine_current_point_is_destination(self):
+		path = Path.fromString(self.pathNodes)
+		expect(path.isAtDest()).to_equal(False)
+
+		nodeLast = path.next().next().next().next().next().next()
+		expect(path.isAtDest()).to_equal(True)
+
+		nodeLast = path.next().next().next().next().next().next().get()
+		expect(path.isAtDest()).to_equal(True)
+
+
+
+
 
 

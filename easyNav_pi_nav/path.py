@@ -35,7 +35,7 @@ class Path(object):
 
 
 	def next(self):
-		if ( (len(self.nodes) - 2) != self.ref ):
+		if ( (len(self.nodes) - 1) != self.ref ):
 			self.ref += 1
 		return self
 
@@ -54,8 +54,27 @@ class Path(object):
 		return self.nodes[self.ref]
 
 
-	def isNear(self):
-		## TODO: implement this
-		pass
+	def isAtDest(self):
+		return (self.ref == (len(self.nodes) - 1) )
+
+
+	def isOnPath(self, pt, thresholdDist, thresholdAngle):
+		# Consider boundary cases
+		if self.ref is 0:
+			return pt.feedback(self.nodes[0], thresholdDist, thresholdAngle)
+		elif self.isAtDest():
+			return pt.feedback(self.nodes[self.ref], thresholdDist, thresholdAngle)
+
+		return pt.pathFeedback(self.nodes[self.ref], thresholdDist, thresholdAngle)
+
+
+
+	# 	ptA = self.nodes[0]
+	# 	ptA = self.nodes[self.ref - 1] if (self.ref != 0)
+	# 	ptB = self.nodes[self.ref]
+
+
+
+
 
 
