@@ -9,6 +9,7 @@
 # Copyright (c) 2014 Joel Tong me@joeltong.org
 
 from preggy import expect
+from numpy import pi
 import requests
 import logging
 import json
@@ -109,6 +110,71 @@ class PathTestCase(TestCase):
 
 		nodeLast = path.next().next().next().next().next().next().get()
 		expect(path.isAtDest()).to_equal(True)
+
+	def test_if_current_point_is_on_path(self):
+		pointList = [Point.fromParam(100,0,0)
+					, Point.fromParam(100,100,0)
+					, Point.fromParam(100,200,0)
+					, Point.fromParam(100,300,0)
+					, Point.fromParam(100,400,0)
+		]
+
+		thresholdDist = 20
+		thresholdAngle = 5 * 0.0174532925			# Radians
+
+		path = Path.fromPoints(pointList)
+
+		pt = Point.fromParam(100,0,0)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.REACHED)
+
+		pt = Point.fromParam(200,0,0, 0)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_LEFT)
+
+		pt = Point.fromParam(0,0,0)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_RIGHT)
+
+		## TODO: This should be OUT OF RANGE.  however, for the cases of first
+		## and last node, we assume that it is still reachable for now.  Hence
+		## only turning error is reported.
+		pt = Point.fromParam(20000,0,0)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_LEFT)
+		# expect(feedback).to_equal(Point.OUT_OF_PATH)
+
+
+		path.next()
+
+		pt = Point.fromParam(100,100,0)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.REACHED)
+
+		pt = Point.fromParam(110,100,0, 0)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_LEFT)
+
+		pt = Point.fromParam(90,100,0)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_RIGHT)
+
+		## Checking with respect to different orientation
+
+		pt = Point.fromParam(110,100,0, pi)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_RIGHT)
+
+		pt = Point.fromParam(90,50, 0, pi / 2)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_RIGHT)
+
+		pt = Point.fromParam(90,150, 0, pi / 2)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_LEFT)
+
+
+
 
 
 

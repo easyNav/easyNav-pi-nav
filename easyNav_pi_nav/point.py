@@ -4,6 +4,7 @@ import json
 import logging
 
 from numpy import linalg
+from math import fmod
 import numpy
 
 class Point(object):
@@ -114,7 +115,6 @@ class Point(object):
 	def loc(self):
 		""" Returns the location of the point, as a dictionary
 		"""
-		logging.info(self.__model["loc"]["y"])
 		return self.__model["loc"]
 
 	def distTo(self, targetPt):
@@ -151,6 +151,7 @@ class Point(object):
 		"""
 		loc_a = self.loc() 
 		loc_b = targetPt.loc() 
+		theta = 0.0 				## init as float
 
 		cX = loc_b['x'] - loc_a['x']
 		cY = loc_b['y'] - loc_a['y']
@@ -166,8 +167,9 @@ class Point(object):
 				theta = numpy.pi / 2
 				return theta
 			else:
-				theta = 3 / 2 * numpy.pi
+				theta = 1.5 * numpy.pi
 				return theta
+
 
 		# Do actual calculation
 		theta = numpy.arctan(abs(cX / cY))
@@ -184,7 +186,7 @@ class Point(object):
 		else:
 			theta = 2 * numpy.pi - theta
 
-		logging.debug('[angleTo, deg]:: {}'.format(numpy.rad2deg(theta)) )
+		# logging.debug('[angleTo, deg]:: {}'.format(numpy.rad2deg(theta)) )
 		return theta
 
 
@@ -204,8 +206,14 @@ class Point(object):
 		positive: needs to move clockwise for correction to target
 		negative: needs to move counter-clockwise for correction to target
 
+		Result normalized to -pi < theta <= pi.
+
 		"""
-		return self.angleTo(targetPt) - self.angle()
+		result = fmod(self.angleTo(targetPt) - self.angle(), 2 * numpy.pi)
+		if (result > numpy.pi):
+			return result - 2 * numpy.pi 
+		else:
+			return result
 
 
 	def angleNear(self, targetPt, threshold):
@@ -323,10 +331,13 @@ class Point(object):
 		## Check for valid line first
 		if point1.isEqualXYZ(point2):
 			return -1
-
 		## Check distance from path.  If too far, then is off track.
-		if self.nearPath(point1, point2, thresholdDist) is False:
-			return Point.OUT_OF_PATH
+		if (self.nearPath(point1, point2, thresholdDist) == False):
+			return {
+				"status": Point.OUT_OF_PATH,
+				"distance": self.distTo(point2),
+				"angleCorrection": self.angleDiff(point2)
+			}
 
 		## Else do normal feedback correction on point2.
 		return self.feedback(point2, thresholdDist, thresholdAngle)

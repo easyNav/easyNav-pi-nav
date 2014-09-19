@@ -65,16 +65,9 @@ class Path(object):
 		elif self.isAtDest():
 			return pt.feedback(self.nodes[self.ref], thresholdDist, thresholdAngle)
 
-		return pt.pathFeedback(self.nodes[self.ref], thresholdDist, thresholdAngle)
-
-
-
-	# 	ptA = self.nodes[0]
-	# 	ptA = self.nodes[self.ref - 1] if (self.ref != 0)
-	# 	ptB = self.nodes[self.ref]
-
-
-
+		ptA = self.nodes[self.ref - 1]
+		ptB = self.nodes[self.ref]
+		return pt.feedbackPath(ptA, ptB, thresholdDist, thresholdAngle)
 
 
 
