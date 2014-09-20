@@ -87,7 +87,9 @@ class Point(object):
 		for key in result["loc"]:
 			result["loc"][key] = float(result["loc"][key])
 
-		if type(result["orientation"]) is str:
+		if (type(result["orientation"]) is unicode):
+			result["orientation"] = float(result["orientation"])
+		elif (type(result["orientation"]) is string):
 			result["orientation"] = float(result["orientation"])
 
 		return cls(result)

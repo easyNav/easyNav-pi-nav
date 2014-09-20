@@ -34,6 +34,18 @@ class Path(object):
 		return cls(args)
 
 
+	def source(self):
+		""" Returns the first point, the starting point (source)
+		"""
+		return self.nodes[0]
+
+
+	def dest(self):
+		""" Returns the last point, the destination. 
+		"""
+		return self.nodes[-1]
+
+
 	def next(self):
 		if ( (len(self.nodes) - 1) != self.ref ):
 			self.ref += 1
