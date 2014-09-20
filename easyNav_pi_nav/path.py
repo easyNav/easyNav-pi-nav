@@ -34,6 +34,14 @@ class Path(object):
 		return cls(args)
 
 
+	def __str__(self):
+		"""String literal for object 
+		"""
+		result = ''
+		for node in self.nodes:
+			result += str(node) + '\n'
+		return result
+
 	def source(self):
 		""" Returns the first point, the starting point (source)
 		"""

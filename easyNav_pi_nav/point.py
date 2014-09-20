@@ -114,6 +114,14 @@ class Point(object):
 		return json.dumps(self.__model, ensure_ascii=True)
 
 
+	def name(self):
+		return self.__model["name"]
+
+
+	def suid(self):
+		return self.__model["SUID"]
+
+
 	def loc(self):
 		""" Returns the location of the point, as a dictionary
 		"""
@@ -172,6 +180,16 @@ class Point(object):
 				theta = 1.5 * numpy.pi
 				return theta
 
+		## Fix faulty case where difference in X coords is 0.
+		if (cX == 0):
+			if (cY >= 0): 
+				theta = numpy.pi
+				return theta
+			else:
+				theta = 0
+				return theta
+
+
 
 		# Do actual calculation
 		theta = numpy.arctan(abs(cX / cY))
@@ -222,6 +240,7 @@ class Point(object):
 		""" Determines if point orientation is aligned to target 
 		"""
 		angleCorrection = self.angleDiff(targetPt)
+		logging.debug(angleCorrection)
 		if (angleCorrection < (-threshold) ):
 			return Point.TURN_LEFT
 		elif (threshold < angleCorrection):

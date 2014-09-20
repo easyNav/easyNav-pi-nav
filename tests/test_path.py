@@ -119,7 +119,7 @@ class PathTestCase(TestCase):
 					, Point.fromParam(100,400,0)
 		]
 
-		thresholdDist = 20
+		thresholdDist = 50
 		thresholdAngle = 5 * 0.0174532925			# Radians
 
 		path = Path.fromPoints(pointList)
@@ -135,6 +135,11 @@ class PathTestCase(TestCase):
 		pt = Point.fromParam(0,0,0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
 		expect(feedback).to_equal(Point.TURN_RIGHT)
+
+		pt = Point.fromParam(0,0,0, pi / 2)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.MOVE_FORWARD)
+
 
 		## TODO: This should be OUT OF RANGE.  however, for the cases of first
 		## and last node, we assume that it is still reachable for now.  Hence
@@ -158,6 +163,10 @@ class PathTestCase(TestCase):
 		pt = Point.fromParam(90,100,0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
 		expect(feedback).to_equal(Point.TURN_RIGHT)
+
+		pt = Point.fromParam(50, 50,0, pi - (pi / 4))
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.MOVE_FORWARD)
 
 		## Checking with respect to different orientation
 
