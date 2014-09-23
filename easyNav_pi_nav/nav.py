@@ -119,8 +119,11 @@ class Nav(object):
 		"""
 		path = self.path()
 		pt = self.loc()
-		logging.debug(pt)
-		logging.debug(path.get())
+		## Return if no path set!
+		if path == None:
+			return
+		logging.debug('Point: %s' % pt)
+		logging.debug('Current target: %s' % path.get())
 		feedback = path.isOnPath(pt, self.THRESHOLD_DIST, self.THRESHOLD_ANGLE)
 
 		status = feedback['status']

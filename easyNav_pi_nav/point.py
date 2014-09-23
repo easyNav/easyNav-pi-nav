@@ -79,7 +79,12 @@ class Point(object):
 		result = {}
 		result["name"] = data.get("name")
 		result["orientation"] = data.get("orientation", 0)
-		result["loc"] = json.loads(data.get("loc"))
+
+		tempLoc = data.get('loc')
+		if type(tempLoc) is dict:
+			result["loc"] = tempLoc
+		else:
+			result["loc"] = json.loads(str(data.get("loc")))
 		result["SUID"] = data.get("SUID")
 		result["id"] = data.get("id")
 

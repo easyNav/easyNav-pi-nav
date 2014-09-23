@@ -110,10 +110,18 @@ class NavTestCase(TestCase):
 		nav.tick(debug=True)
 
 
+	def test_can_run_as_daemon(self):
+		nav = Nav()
 
+		nav.start()
+		running = True
+		# Run Nav for 5 seconds
+		time.sleep(5)
 
-
-
+		nav.stop()
+		running = False 
+		expect(running).to_equal(False)
+		
 
 
 	# def test_can_add(self):
