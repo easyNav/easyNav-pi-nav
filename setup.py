@@ -60,6 +60,7 @@ easyNav Pi Nav daemon
         'console_scripts': [
             # add cli scripts here in this form:
             # 'easyNav-pi-nav=easyNav_pi_nav.cli:main',
+            'easyNav-pi-nav=easyNav_pi_nav.nav:runMain'
         ],
     },
 )

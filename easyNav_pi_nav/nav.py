@@ -25,7 +25,7 @@ class Nav(object):
 	RUNLVL_NORMAL = 0
 	RUNLVL_WARNING_OBSTACLE = 1
 
-	"""docstring for Nav"""
+
 	def __init__(self):
 		super(Nav, self).__init__()
 
