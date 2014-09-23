@@ -52,6 +52,8 @@ easyNav Pi Nav daemon
     install_requires=[
         # add your dependencies here
         # remember to use 'package-name>=x.y.z,<x.y+1.0' notation (this way you get bugfixes)
+        'smokesignal>=0.5',
+        'easyNav-pi-dispatcher>=0.1.2'
     ],
     extras_require={
         'tests': tests_require,

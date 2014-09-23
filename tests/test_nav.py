@@ -11,11 +11,15 @@
 from preggy import expect
 import time
 import requests
+import smokesignal
+import logging
 from numpy import pi
+from tests.base import TestCase
+
+from easyNav_pi_dispatcher import DispatcherClient
 
 from easyNav_pi_nav import Nav, Point, Path
 
-from tests.base import TestCase
 
 
 class NavTestCase(TestCase):
@@ -121,6 +125,31 @@ class NavTestCase(TestCase):
 		nav.stop()
 		running = False 
 		expect(running).to_equal(False)
+
+
+	def test_daemon_can_receive_event_get_new_path(self):
+		""" NOTE: As this test is async, and NoseTest does not 
+		support async tests, please check this manually.
+		"""
+		logging.info('')
+		logging.info('---started event test---')
+
+		## Setup Nav daemon
+		nav = Nav()
+		nav.start()
+
+		## Setup client and send info
+		client = DispatcherClient(port=9002)
+		client.start()
+		client.send(9001, 'newPath', {"to" : "5"})
+		logging.info('Requested for new Path from 9002.')
+
+		## Keep daemons alive for 5 seconds.
+		time.sleep(5)
+
+		client.stop()
+		nav.stop()
+		logging.info('---finished event test---')
 		
 
 

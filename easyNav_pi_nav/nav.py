@@ -6,6 +6,9 @@ import json
 import requests
 import logging
 import time
+import smokesignal
+
+from easyNav_pi_dispatcher import DispatcherClient
 
 from path import Path 
 from point import Point
@@ -43,12 +46,22 @@ class Nav(object):
 		self._threadListen = None
 		self._active = True
 
+		## For interprocess comms 
+		self.DISPATCHER_PORT = 9001
+		self._dispatcherClient = DispatcherClient(port=self.DISPATCHER_PORT)
+
+		## Attach event listeners upon instantiation (to prevent duplicates)
+		self.attachEvents()
+
 		logging.info('Nav Daemon running.')
 
 
 	def start(self):
 		""" Start the daemon and run persistently.  Auto-retrieves new map in starting. 
 		"""
+		## Start inter-process comms
+		self._dispatcherClient.start()
+
 		self.resetMap()
 		self.updateMap()
 
@@ -68,7 +81,40 @@ class Nav(object):
 		"""
 		self._active = False
 		self._threadListen.join()
+
+		## Stop inter-process comms
+		self._dispatcherClient.stop()
+
 		logging.info('Nav: Stopped Daemon.')
+
+
+
+	def attachEvents(self):
+		"""Configure event callbacks to attach to daemon on start.
+
+		All events must be a series of event functions.
+
+		Do not call this externally!
+		"""
+		## clear all signals
+		smokesignal.clear()
+
+		@smokesignal.on('newPath')
+		def onNewPath(args):
+			logging.debug('Event triggered: Request for new path.')
+			nodeTo = args.get('to')
+			if ((nodeTo == None)):
+				logging.error('Received no start / end nodes')
+				return
+			self.getPathTo(nodeTo)
+
+
+		@smokesignal.on('obstacle')
+		def onObstacle(args):
+			##TODO: Implement obstacle detection
+			pass
+
+
 
 
 	def resetMap(self):
@@ -97,7 +143,7 @@ class Nav(object):
 		"""Gets shortest path from point from current location, and updates internal
 		path accordingly.
 		"""
-		r = requests.get(Nav.HOST_ADDR + '/map/goto/' + pointId)
+		r = requests.get(Nav.HOST_ADDR + '/map/goto/' + str(pointId))
 		self.__model['path'] = Path.fromString(r.text)
 		logging.info('Retrieved new path.')
 
