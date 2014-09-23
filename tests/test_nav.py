@@ -21,24 +21,24 @@ from tests.base import TestCase
 class NavTestCase(TestCase):
 
 	def test_can_init(self):
-		bla = Nav(None)
+		bla = Nav()
 		pass
 
 
 	def test_can_update_map(self):
-		nav = Nav(None)
+		nav = Nav()
 		nav.resetMap()
 		nav.updateMap()
 
 
 	def test_can_get_position(self):
-		nav = Nav(None)
+		nav = Nav()
 		nav.getPos()
 		expect(type(nav.loc()) is Point).to_equal(True)
 
 
 	def test_can_get_path_to_location(self):
-		nav = Nav(None)
+		nav = Nav()
 		nav.resetMap()
 		nav.updateMap()
 		time.sleep(5)
@@ -50,7 +50,7 @@ class NavTestCase(TestCase):
 
 
 	def test_feedback_works(self):
-		nav = Nav(None)
+		nav = Nav()
 		injection = nav.__dict__['_Nav__model']
 
 		## Direct dependency injection, to override server stuff.

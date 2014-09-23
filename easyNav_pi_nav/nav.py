@@ -1,10 +1,11 @@
 
 #!/usr/bin/python
 
-import multiprocessing
+import threading
 import json
 import requests
 import logging
+import time
 
 from path import Path 
 from point import Point
@@ -20,40 +21,68 @@ class Nav(object):
 	THRESHOLD_DIST = 50
 	THRESHOLD_ANGLE = 5 * 0.0174532925
 
-	"""docstring for Nav"""
-	def __init__(self, arg):
-		super(Nav, self).__init__()
-		self.arg = arg
+	## Run Levels here
+	RUNLVL_NORMAL = 0
+	RUNLVL_WARNING_OBSTACLE = 1
 
+	"""docstring for Nav"""
+	def __init__(self):
+		super(Nav, self).__init__()
+
+		self.runLevel = Nav.RUNLVL_NORMAL
+		## Sets the run interval, in terms of number of seconds
+		self.RUN_INTERVAL = 5
+
+		########## Private vars ##########
 		self.__model = {
 			'path': None,
 			'currLoc': Point.fromParam()
 		}
 
+		## For multithreading
+		self._threadListen = None
+		self._active = True
 
-	def area(self):
-		return 2 + 3;
-		
+		logging.info('Nav Daemon running.')
 
-	def run(self):
-		pass
+
+	def start(self):
+		""" Start the daemon and run persistently.  Auto-retrieves new map in starting. 
+		"""
+		self.resetMap()
+		self.updateMap()
+
+		def runThread():
+			while(self._active):
+				self.tick()
+				time.sleep(5)
+
+
+		self._threadListen = threading.Thread(target=runThread)
+		self._threadListen.start()
+		logging.info('Nav: Started Daemon.')
+
 
 	def stop(self):
-		pass
+		""" Stops the Nav daemon. 
+		"""
+		self._active = False
+		self._threadListen.join()
+		logging.info('Nav: Stopped Daemon.')
 
 
 	def resetMap(self):
 		"""Resets the map.
 		"""
 		r = requests.delete(Nav.HOST_ADDR + '/map')
-		pass
+		logging.info('Map deleted.')
 
 
 	def updateMap(self):
 		"""Updates the map on server. 
 		"""
 		r = requests.get(Nav.HOST_ADDR + '/map/update')
-		pass
+		logging.info('Map cleared.')
 
 
 	def getPos(self):
@@ -62,7 +91,6 @@ class Nav(object):
 		"""
 		r = requests.get(Nav.HOST_ADDR + '/heartbeat/location')
 		self.__model['currLoc'] = Point.fromJson(r.text)
-		pass
 
 
 	def getPathTo(self, pointId):
@@ -71,8 +99,7 @@ class Nav(object):
 		"""
 		r = requests.get(Nav.HOST_ADDR + '/map/goto/' + pointId)
 		self.__model['path'] = Path.fromString(r.text)
-		logging.debug('Retrieved new path.')
-		pass
+		logging.info('Retrieved new path.')
 
 
 	def path(self):
@@ -87,8 +114,8 @@ class Nav(object):
 		return self.__model['currLoc']
 
 
-	def feedbackCorrection(self):
-		"""Feedback correction control. 
+	def exeLevelNorm(self):
+		""" Called for run level RUNLVL_NORMAL.  Do not call externally.
 		"""
 		path = self.path()
 		pt = self.loc()
@@ -105,8 +132,6 @@ class Nav(object):
 				logging.debug('checkpoint reached!')
 			else:
 				logging.debug('Reached destination, done!')
-
-
 			pass
 
 		elif (status is Point.MOVE_FORWARD):
@@ -139,6 +164,23 @@ class Nav(object):
 			## Oops uncaught feedback 
 			logging.warn('Oops, did we account for all feedback flags?')
 			pass
+		pass
+
+
+	def exeLevelWarnObstacle(self):
+		""" Called for run level RUNLVL_WARN_OBSTACLE.  Do not call externally.
+		"""
+		logging.warn('Near obstacle!!')
+		pass
+
+
+	def feedbackCorrection(self):
+		"""Feedback correction control, called by Nav daemon automatically.
+		"""
+		if (self.runLevel == Nav.RUNLVL_NORMAL):
+			self.exeLevelNorm()
+		elif (self.runLevel == Nav.RUNLVL_WARNING_OBSTACLE):
+			self.exeLevelWarnObstacle()
 
 		pass 
 
@@ -154,13 +196,22 @@ class Nav(object):
 		pass
 
 
-	def run(self):
-		"""Main function for daemon
-		"""
-		while(True):
-			tick()
-			time.sleep(3)
-		pass
+
+
+###################################
+##  Main program defined here    ##
+###################################
+
+def runMain():
+	""" Main function called when run as standalone daemon
+	"""
+	nav = Nav()
+	nav.start()
+
+
+if __name__ == '__main__':
+	runMain()
+
 
 
 
