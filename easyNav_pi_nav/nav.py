@@ -73,6 +73,8 @@ class Nav(object):
 
 		self._threadListen = threading.Thread(target=runThread)
 		self._threadListen.start()
+
+		self._dispatcherClient.send(9002, 'say', {'text': 'Started Navigation Daemon.'})
 		logging.info('Nav: Started Daemon.')
 
 
@@ -81,6 +83,8 @@ class Nav(object):
 		"""
 		self._active = False
 		self._threadListen.join()
+
+		self._dispatcherClient.send(9002, 'say', {'text': 'Stopping Navigation Daemon.'})
 
 		## Stop inter-process comms
 		self._dispatcherClient.stop()
@@ -128,7 +132,8 @@ class Nav(object):
 		"""Updates the map on server. 
 		"""
 		r = requests.get(Nav.HOST_ADDR + '/map/update')
-		logging.info('Map cleared.')
+		# self._dispatcherClient.send(9002, 'say', {'text': 'Map updated.'})
+		logging.info('Map updated.')
 
 
 	def getPos(self):
@@ -145,6 +150,7 @@ class Nav(object):
 		"""
 		r = requests.get(Nav.HOST_ADDR + '/map/goto/' + str(pointId))
 		self.__model['path'] = Path.fromString(r.text)
+		self._dispatcherClient.send(9002, 'say', {'text': 'Retrieved new path.'})
 		logging.info('Retrieved new path.')
 
 
@@ -178,34 +184,37 @@ class Nav(object):
 
 			if (path.isAtDest() is False): 
 				self.__model['path'].next()
+				self._dispatcherClient.send(9002, 'say', {'text': 'Checkpoint reached!'})
 				logging.debug('checkpoint reached!')
 			else:
+				self._dispatcherClient.send(9002, 'say', {'text': 'You have reached your destination!'})
 				logging.debug('Reached destination, done!')
 			pass
 
 		elif (status is Point.MOVE_FORWARD):
-			##TODO: Implement print to voice
+			self._dispatcherClient.send(9002, 'say', {'text': 'Move forward!'})
 			logging.debug('move forward!')
 			pass
 
 		elif (status is Point.OUT_OF_PATH):
-			##TODO: Implement print to voice
+			self._dispatcherClient.send(9002, 'say', {'text': 'Out of path!'})
 			logging.debug('Out of path!')
 			self.getPathTo( self.path().dest().name() )
 			pass
 
 		elif (status is Point.ALIGNED):
 			##TODO: Implement print to voice
+			# self._dispatcherClient.send(9002, 'say', {'text': 'Out of path!'})
 			logging.debug('Point aligned!')
 			pass
 
 		elif (status is Point.TURN_LEFT):
-			##TODO: Implement print to voice
+			self._dispatcherClient.send(9002, 'say', {'text': 'Turn left!'})
 			logging.debug('Turn left!')
 			pass
 
 		elif (status is Point.TURN_RIGHT):
-			##TODO: Implement print to voice
+			self._dispatcherClient.send(9002, 'say', {'text': 'Turn right!'})
 			logging.debug('Turn right!')
 			pass
 
@@ -219,6 +228,8 @@ class Nav(object):
 	def exeLevelWarnObstacle(self):
 		""" Called for run level RUNLVL_WARN_OBSTACLE.  Do not call externally.
 		"""
+		# TODO: Code warn obstacle stuff
+		self._dispatcherClient.send(9002, 'say', {'text': 'Near obstacle!'})
 		logging.warn('Near obstacle!!')
 		pass
 
