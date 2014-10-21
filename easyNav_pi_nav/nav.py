@@ -111,6 +111,10 @@ class Nav(object):
 			if ((nodeTo == None) or (nodeFrom == None)):
 				logging.error('Received no start / end nodes')
 				return
+
+			## reset current location
+			self.setPosBySUID(str(nodeFrom))
+			## Get new path
 			self.getPathTo(nodeTo)
 
 
@@ -132,7 +136,7 @@ class Nav(object):
 			+ '&z=' + _z)
 
 
-	def setPosBySUID(self, suid):
+	def setPosBySUID(self, suid=0):
 		"""Set position on server, by SUID
 		"""
 		## Get the SUID coordinates
