@@ -94,7 +94,7 @@ class Point(object):
 
 		if (type(result["orientation"]) is unicode):
 			result["orientation"] = float(result["orientation"])
-		elif (type(result["orientation"]) is string):
+		elif (type(result["orientation"]) is str):
 			result["orientation"] = float(result["orientation"])
 
 		return cls(result)

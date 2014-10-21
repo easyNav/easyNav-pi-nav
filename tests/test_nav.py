@@ -41,6 +41,14 @@ class NavTestCase(TestCase):
 		expect(type(nav.loc()) is Point).to_equal(True)
 
 
+	def test_can_set_position_by_suid(self):
+		nav = Nav()
+		nav.setPosBySUID(3)
+		nav.getPos()
+		logging.debug(nav.loc())
+		## TODO write assertions for this
+
+
 	def test_can_get_path_to_location(self):
 		nav = Nav()
 		nav.resetMap()
@@ -150,7 +158,104 @@ class NavTestCase(TestCase):
 		client.stop()
 		nav.stop()
 		logging.info('---finished event test---')
+
+	# #TODO: remove this -------------------------------------------------------
+	# def test_feedback_works_TEMP(self):
+
+	# 	nav = Nav()
+	# 	injection = nav.__dict__['_Nav__model']
+
+	# 	## Direct dependency injection, to override server stuff.
+	# 	## This is used to reduce dependency on server for testing.
+
+	# 	nav.resetMap()
+	# 	nav.updateMapCustom('nocobot', '2')
+
+	# 	pointList = [
+	# 		#Point.fromParam(25, 250, 0, name="DOT 11"),
+	# 		#Point.fromParam(125, 250, 0, name="DOT 14"),
+	# 		Point.fromParam(225, 175, 0, name="DOT 17"),
+	# 		Point.fromParam(450, 175, 0, name="DOT 9"),
+	# 		Point.fromParam(450, 75, 0, name="DOT 6")
+	# 	]
+
+	# 	path = Path.fromPoints(pointList)
+	# 	injection['path'] = path
+
+
+	# 	## Do direct dependency injection
+	# 	# injection['path'].next();
+	# 	# injection['path'].next();
+	# 	nav.tick(debug=True)
+	# 	nav.tick(debug=True)
+	# 	# print('showed point 1--------------------------------------')
+	# 	# injection['currLoc'] = Point.fromParam(350,180,0, pi / 2)
+	# 	# nav.tick(debug=True)
+	# 	# nav.tick(debug=True)
+	# 	# nav.tick(debug=True)
+	# 	# nav.tick(debug=True)
+	# 	injection['path'].next();
+
+	# 	print('showed point 2--------------------------------------')
+	# 	injection['currLoc'] = Point.fromParam(200,325,0, 3 * pi / 2)
+	# 	nav.tick(debug=True)
+	# 	nav.tick(debug=True)
+	# 	nav.tick(debug=True)
+	# 	nav.tick(debug=True)
+
+	# 	injection['path'].next();
+
+	# 	print('showed point 3--------------------------------------')
+	# 	injection['currLoc'] = Point.fromParam(450,125,0, pi)
+	# 	nav.tick(debug=True)
+	# 	nav.tick(debug=True)
+	# 	nav.tick(debug=True)
+	# 	nav.tick(debug=True)
+
+
+	# 	while(True):
+	# 		time.sleep(1)
+	# 		pass
 		
+
+	# 	## reached
+	# 	injection['currLoc'] = Point.fromParam(100,0,0, 0)
+	# 	nav.tick(debug=True)
+
+	# 	injection['currLoc'] = Point.fromParam(100,50,0 , 0)
+	# 	nav.tick(debug=True)
+
+	# 	injection['currLoc'] = Point.fromParam(50,50,0 , pi - (pi / 4) )
+	# 	nav.tick(debug=True)
+
+	# 	## reached
+	# 	injection['currLoc'] = Point.fromParam(100,100,0, 0)
+	# 	nav.tick(debug=True)
+
+	# 	injection['currLoc'] = Point.fromParam(102, 150,0, 0)
+	# 	nav.tick(debug=True)
+
+	# 	injection['currLoc'] = Point.fromParam(102, 150,0, pi)
+	# 	nav.tick(debug=True)
+
+	# 	injection['currLoc'] = Point.fromParam(100, 150,0, pi)
+	# 	nav.tick(debug=True)
+
+	# 	## reached
+	# 	injection['currLoc'] = Point.fromParam(100,200,0)
+	# 	nav.tick(debug=True)
+
+	# 	## Reached
+	# 	injection['currLoc'] = Point.fromParam(100,300,0)
+	# 	nav.tick(debug=True)
+
+	# 	## Reached
+	# 	injection['currLoc'] = Point.fromParam(100,400,0)
+	# 	nav.tick(debug=True)
+
+	# 	injection['currLoc'] = Point.fromParam(100,400,0)
+	# 	nav.tick(debug=True)
+
 
 
 	# def test_can_add(self):

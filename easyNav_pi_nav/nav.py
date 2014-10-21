@@ -106,8 +106,9 @@ class Nav(object):
 		@smokesignal.on('newPath')
 		def onNewPath(args):
 			logging.debug('Event triggered: Request for new path.')
+			nodeFrom = args.get('from')
 			nodeTo = args.get('to')
-			if ((nodeTo == None)):
+			if ((nodeTo == None) or (nodeFrom == None)):
 				logging.error('Received no start / end nodes')
 				return
 			self.getPathTo(nodeTo)
@@ -119,6 +120,36 @@ class Nav(object):
 			pass
 
 
+	def setPosByXYZ(self, x=0, y=0, z=0):
+		""" Set position by XYZ 
+		"""
+		_x = str(x)
+		_y = str(y)
+		_z = str(z)
+		r = requests.post(Nav.HOST_ADDR 
+			+ '/heartbeat/location/?x=' + _x
+			+ '&y=' + _y
+			+ '&z=' + _z)
+
+
+	def setPosBySUID(self, suid):
+		"""Set position on server, by SUID
+		"""
+		## Get the SUID coordinates
+		r = requests.get(Nav.HOST_ADDR + '/node/?SUID=' + str(suid))
+		response = json.loads(r.text)
+
+		## Invalid point exception
+		if (response == []):
+			logging.error('Oops.  No such SUID on server.')
+			return
+
+		response = response[0]
+		loc = json.loads(response.get('loc'))
+		
+		## Set coordinates
+		x,y,z = loc.get('x'), loc.get('y'), loc.get('z')
+		self.setPosByXYZ(x,y,z)
 
 
 	def resetMap(self):
@@ -134,6 +165,13 @@ class Nav(object):
 		r = requests.get(Nav.HOST_ADDR + '/map/update')
 		# self._dispatcherClient.send(9002, 'say', {'text': 'Map updated.'})
 		logging.info('Map updated.')
+
+	def updateMapCustom(self, building, floor):
+		"""Updates the map on server, with floor and building name.
+		"""
+		r = requests.get(Nav.HOST_ADDR + '/map/update?floor=' + floor + '&building=' + building)
+		# self._dispatcherClient.send(9002, 'say', {'text': 'Map updated.'})
+		logging.info('Map updated with building ' + building + ' at floor ' + floor)
 
 
 	def getPos(self):
