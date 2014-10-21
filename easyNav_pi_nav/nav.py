@@ -124,24 +124,33 @@ class Nav(object):
 			pass
 
 
-	def setPosByXYZ(self, x=0, y=0, z=0):
+	def setPosByXYZ(self, x=0, y=0, z=0, orientation=0):
 		""" Set position by XYZ 
 		"""
 		_x = str(x)
 		_y = str(y)
 		_z = str(z)
+		_orientation = str(orientation)
 		r = requests.post(Nav.HOST_ADDR 
 			+ '/heartbeat/location/?x=' + _x
 			+ '&y=' + _y
-			+ '&z=' + _z)
+			+ '&z=' + _z
+			+ '&orientation=' + _orientation)
 
 
 	def setPosBySUID(self, suid=0):
 		"""Set position on server, by SUID
 		"""
+		## Get the current old values (orientation workaround)
+		self.getPos()
+		orientation = 0
+		# orientation = (self.__model['currLoc'])['orientation']
+		### TODO: Fix orientation bug
+
 		## Get the SUID coordinates
 		r = requests.get(Nav.HOST_ADDR + '/node/?SUID=' + str(suid))
 		response = json.loads(r.text)
+
 
 		## Invalid point exception
 		if (response == []):
@@ -153,7 +162,7 @@ class Nav(object):
 		
 		## Set coordinates
 		x,y,z = loc.get('x'), loc.get('y'), loc.get('z')
-		self.setPosByXYZ(x,y,z)
+		self.setPosByXYZ(x,y,z, orientation)
 
 
 	def resetMap(self):

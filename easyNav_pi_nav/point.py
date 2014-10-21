@@ -369,5 +369,3 @@ class Point(object):
 		return self.feedback(point2, thresholdDist, thresholdAngle)
 
 
-
-
