@@ -53,6 +53,10 @@ class Nav(object):
 		## Attach event listeners upon instantiation (to prevent duplicates)
 		self.attachEvents()
 
+		## For collision detection: lock navigation until ready
+		self.collisionLocked = False
+		self.obstacle = None
+
 		logging.info('Nav Daemon running.')
 
 
@@ -120,8 +124,19 @@ class Nav(object):
 
 		@smokesignal.on('obstacle')
 		def onObstacle(args):
-			##TODO: Implement obstacle detection
-			pass
+			response = int(json.loads(args.get('payload')).get('status'))
+			if (response == 0):
+				self.obstacle = None
+				return # Do not set collision locked
+			elif (response == 1):
+				self.obstacle = 'FRONT'
+			elif (response == 2):
+				self.obstacle = 'LEFT'
+			elif (response == 3):
+				self.obstacle = 'RIGHT'
+
+			# If collision, set to true
+			self.collisionLocked = True
 
 
 	def setPosByXYZ(self, x=0, y=0, z=0, orientation=0):
@@ -230,6 +245,33 @@ class Nav(object):
 		feedback = path.isOnPath(pt, self.THRESHOLD_DIST, self.THRESHOLD_ANGLE)
 
 		status = feedback['status']
+
+		## Collision detection first
+		if (self.collisionLocked):
+			if (self.obstacle == None):
+				# Unlock collisionLocked
+				self._dispatcherClient.send(9002, 'say', {'text': 'Obstacle cleared.  Move forward!'})
+				logging.debug('Obstacle cleared.  Move forward!')
+				self.collisionLocked = False
+				time.sleep(5)
+				logging.debug('Time to clear obstacle has passed.')
+
+			elif (self.obstacle == 'FRONT'):
+				self._dispatcherClient.send(9002, 'say', {'text': 'Obstacle ahead.  Turn left or right!'})
+				logging.debug('Obstacle ahead.  Turn left or right!')
+
+			elif (self.obstacle == 'LEFT'):
+				self._dispatcherClient.send(9002, 'say', {'text': 'Obstacle on the left!'})
+				logging.debug('Obstacle on the left!')
+
+			elif (self.obstacle == 'RIGHT'):
+				self._dispatcherClient.send(9002, 'say', {'text': 'Obstacle on the right!'})
+				logging.debug('Obstacle on the right!')
+
+			# Do not execute below
+			return 
+
+
 		if (status is Point.REACHED):
 			##TODO: Implement print to voice
 
