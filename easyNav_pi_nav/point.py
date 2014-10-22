@@ -247,9 +247,9 @@ class Point(object):
 		angleCorrection = self.angleDiff(targetPt)
 		logging.debug(angleCorrection)
 		if (angleCorrection < (-threshold) ):
-			return Point.TURN_LEFT
-		elif (threshold < angleCorrection):
 			return Point.TURN_RIGHT
+		elif (threshold < angleCorrection):
+			return Point.TURN_LEFT
 		else:
 			return Point.ALIGNED
 		pass

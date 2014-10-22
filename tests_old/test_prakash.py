@@ -24,140 +24,97 @@ from easyNav_pi_nav import Nav, Point, Path
 
 class NavTestCase(TestCase):
 
-	def test_can_init(self):
-		bla = Nav()
-		pass
 
-
-	def test_can_update_map(self):
-		nav = Nav()
-		nav.resetMap()
-		nav.updateMap()
-
-
-	def test_can_get_position(self):
-		nav = Nav()
-		nav.getPos()
-		expect(type(nav.loc()) is Point).to_equal(True)
-
-
-	def test_can_set_position_by_suid(self):
-		nav = Nav()
-		nav.setPosBySUID(3)
-		nav.getPos()
-		logging.debug(nav.loc())
-		## TODO write assertions for this
-
-
-	def test_can_get_path_to_location(self):
-		nav = Nav()
-		nav.resetMap()
-		nav.updateMap()
-		time.sleep(5)
-		nav.getPathTo('5')
-		expect(type(nav.path()) is Path).to_equal(True)
-
-		print '------RESPONSE---------'
-		print nav.path()
-
-
-	def test_feedback_works(self):
+	def test_prakash_path(self):
 		nav = Nav()
 		injection = nav.__dict__['_Nav__model']
 
 		## Direct dependency injection, to override server stuff.
 		## This is used to reduce dependency on server for testing.
-		pointList = [Point.fromParam(100,0,0)
-					, Point.fromParam(100,100,0)
-					, Point.fromParam(100,200,0)
-					, Point.fromParam(100,300,0)
-					, Point.fromParam(100,400,0)
+		pointList = [Point.fromParam(0,1260,0, 0)
+					, Point.fromParam(1420,1260,0, 0)
+					, Point.fromParam(1420,1440,0, 0)
 		]
-		path = Path.fromPoints(pointList)
+		path = Path.fromPoints(list(pointList))
 		injection['path'] = path
 
 		nav.resetMap()
 		nav.updateMap()
 
+
 		## Do direct dependency injection
-		injection['currLoc'] = Point.fromParam(0,0,0, 0)
+		print '-----------------PING--------------'
+		injection['currLoc'] = Point.fromParam(0,1260,0, 0)
 		nav.tick(debug=True)
+		print '-----------------PING--------------'
+
+
+		print '-----------------PING--------------'
+		injection['currLoc'] = Point.fromParam(1420,1260,0, 0)
+		nav.tick(debug=True)
+		print '-----------------PING--------------'
+
+		print '-----------------PING--------------'
+		injection['currLoc'] = Point.fromParam(1420,1440,0, 0)
+		nav.tick(debug=True)
+		print '-----------------PING--------------'
+
+		print path.get()
+
+		# while(True):
+		# 	time.sleep(1)
+
+		# injection['currLoc'] = Point.fromParam(50,1260,0, 4.712385)
+		# nav.tick(debug=True)
+
+		## Do direct dependency injection
+		# for i in range(0, 360, 5):
+		# 	print i
+		# 	rad = (float(i) / 180) * 3.14159
+		# 	print ('------ORIENTATION: %s' % rad)
+		# 	injection['currLoc'] = Point.fromParam(2,1260,0, rad)
+		# 	nav.tick(debug=True)
+
+		# while (True):
+		# 	time.sleep(1)
 
 		## reached
-		injection['currLoc'] = Point.fromParam(100,0,0, 0)
-		nav.tick(debug=True)
+		# injection['currLoc'] = Point.fromParam(100,0,0, 0)
+		# nav.tick(debug=True)
 
-		injection['currLoc'] = Point.fromParam(100,50,0 , 0)
-		nav.tick(debug=True)
+		# injection['currLoc'] = Point.fromParam(100,50,0 , 0)
+		# nav.tick(debug=True)
 
-		injection['currLoc'] = Point.fromParam(50,50,0 , pi - (pi / 4) )
-		nav.tick(debug=True)
-
-		## reached
-		injection['currLoc'] = Point.fromParam(100,100,0, 0)
-		nav.tick(debug=True)
-
-		injection['currLoc'] = Point.fromParam(102, 150,0, 0)
-		nav.tick(debug=True)
-
-		injection['currLoc'] = Point.fromParam(102, 150,0, pi)
-		nav.tick(debug=True)
-
-		injection['currLoc'] = Point.fromParam(100, 150,0, pi)
-		nav.tick(debug=True)
+		# injection['currLoc'] = Point.fromParam(50,50,0 , pi - (pi / 4) )
+		# nav.tick(debug=True)
 
 		## reached
-		injection['currLoc'] = Point.fromParam(100,200,0)
-		nav.tick(debug=True)
+		# injection['currLoc'] = Point.fromParam(100,100,0, 0)
+		# nav.tick(debug=True)
 
-		## Reached
-		injection['currLoc'] = Point.fromParam(100,300,0)
-		nav.tick(debug=True)
+		# injection['currLoc'] = Point.fromParam(102, 150,0, 0)
+		# nav.tick(debug=True)
 
-		## Reached
-		injection['currLoc'] = Point.fromParam(100,400,0)
-		nav.tick(debug=True)
+		# injection['currLoc'] = Point.fromParam(102, 150,0, pi)
+		# nav.tick(debug=True)
 
-		injection['currLoc'] = Point.fromParam(100,400,0)
-		nav.tick(debug=True)
+		# injection['currLoc'] = Point.fromParam(100, 150,0, pi)
+		# nav.tick(debug=True)
 
+		# ## reached
+		# injection['currLoc'] = Point.fromParam(100,200,0)
+		# nav.tick(debug=True)
 
-	def test_can_run_as_daemon(self):
-		nav = Nav()
+		# ## Reached
+		# injection['currLoc'] = Point.fromParam(100,300,0)
+		# nav.tick(debug=True)
 
-		nav.start()
-		running = True
-		# Run Nav for 5 seconds
-		time.sleep(5)
+		# ## Reached
+		# injection['currLoc'] = Point.fromParam(100,400,0)
+		# nav.tick(debug=True)
 
-		nav.stop()
-		running = False 
-		expect(running).to_equal(False)
-
-
-	def test_daemon_can_receive_event_get_new_path(self):
-		""" NOTE: As this test is async, and NoseTest does not 
-		support async tests, please check this manually.
-		"""
-		logging.info('')
-		logging.info('---started event test---')
-
-		## Setup Nav daemon
-		nav = Nav()
-		nav.start()
-
-		## Setup client and send info
-		client = DispatcherClient(port=9002)
-		client.start()
-		client.send(9001, 'newPath', {"to" : "5"})
-		logging.info('Requested for new Path from 9002.')
-
-		## Keep daemons alive for 5 seconds.
-		time.sleep(5)
-
-		client.stop()
-		nav.stop()
-		logging.info('---finished event test---')
+		# injection['currLoc'] = Point.fromParam(100,400,0)
+		# nav.tick(debug=True)
 
 
 	# #TODO: remove this -------------------------------------------------------

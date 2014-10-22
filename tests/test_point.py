@@ -106,7 +106,7 @@ class NavTestCase(TestCase):
 	def test_feedback_correction_is_working(self):
 		thresholdDist, thresholdAngle  = 10, 0.17453
 		feedback = self.pt.feedback(self.pt2, thresholdDist, thresholdAngle)
-		expect(feedback['status']).to_equal(Point.TURN_RIGHT)
+		expect(feedback['status']).to_equal(Point.TURN_LEFT)
 
 	def test_distance_to_line_path_works(self):
 		"""Determines distance of point from pathway between 2 lines

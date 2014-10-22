@@ -235,6 +235,7 @@ class Nav(object):
 
 			if (path.isAtDest() is False): 
 				self.__model['path'].next()
+				# print ('--------------------------' + self.__model['path'].nodes)
 				self._dispatcherClient.send(9002, 'say', {'text': 'Checkpoint reached!'})
 				logging.debug('checkpoint reached!')
 			else:

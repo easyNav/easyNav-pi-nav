@@ -130,11 +130,11 @@ class PathTestCase(TestCase):
 
 		pt = Point.fromParam(200,0,0, 0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_LEFT)
+		expect(feedback).to_equal(Point.TURN_RIGHT)
 
 		pt = Point.fromParam(0,0,0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_RIGHT)
+		expect(feedback).to_equal(Point.TURN_LEFT)
 
 		pt = Point.fromParam(0,0,0, pi / 2)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
@@ -146,7 +146,7 @@ class PathTestCase(TestCase):
 		## only turning error is reported.
 		pt = Point.fromParam(20000,0,0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_LEFT)
+		expect(feedback).to_equal(Point.TURN_RIGHT)
 		# expect(feedback).to_equal(Point.OUT_OF_PATH)
 
 
@@ -158,11 +158,11 @@ class PathTestCase(TestCase):
 
 		pt = Point.fromParam(110,100,0, 0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_LEFT)
+		expect(feedback).to_equal(Point.TURN_RIGHT)
 
 		pt = Point.fromParam(90,100,0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_RIGHT)
+		expect(feedback).to_equal(Point.TURN_LEFT)
 
 		pt = Point.fromParam(50, 50,0, pi - (pi / 4))
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
@@ -172,15 +172,15 @@ class PathTestCase(TestCase):
 
 		pt = Point.fromParam(110,100,0, pi)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_RIGHT)
+		expect(feedback).to_equal(Point.TURN_LEFT)
 
 		pt = Point.fromParam(90,50, 0, pi / 2)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_RIGHT)
+		expect(feedback).to_equal(Point.TURN_LEFT)
 
 		pt = Point.fromParam(90,150, 0, pi / 2)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_LEFT)
+		expect(feedback).to_equal(Point.TURN_RIGHT)
 
 
 
