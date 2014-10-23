@@ -9,6 +9,7 @@ import time
 import smokesignal
 
 from easyNav_pi_dispatcher import DispatcherClient
+from easyNav_pi_nav import __version__
 
 from path import Path 
 from point import Point
@@ -22,7 +23,7 @@ class Nav(object):
 
 	HOST_ADDR = "http://localhost:1337"
 	THRESHOLD_DIST = 50
-	THRESHOLD_ANGLE = 5 * 0.0174532925
+	THRESHOLD_ANGLE = 15 * 0.0174532925
 
 	## Run Levels here
 	RUNLVL_NORMAL = 0
@@ -79,7 +80,7 @@ class Nav(object):
 		self._threadListen.start()
 
 		self._dispatcherClient.send(9002, 'say', {'text': 'Started Navigation Daemon.'})
-		logging.info('Nav: Started Daemon.')
+		logging.info('Nav: Started Daemon v%s.' % __version__)
 
 
 	def stop(self):

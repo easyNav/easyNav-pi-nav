@@ -8,4 +8,4 @@
 # http://www.opensource.org/licenses/MIT-license
 # Copyright (c) 2014 Joel Tong me@joeltong.org
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
