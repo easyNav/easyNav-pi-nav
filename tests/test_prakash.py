@@ -24,16 +24,31 @@ from easyNav_pi_nav import Nav, Point, Path
 
 class NavTestCase(TestCase):
 
+	# def test_proximity_pt(self):
+	# 	a = Point.fromParam(0,99,0,0)
+	# 	b = Point.fromParam(0,100,0,0)
+	# 	logging.info('*********')
+	# 	logging.info(a.feedback(b, 800, 0))
+	# 	while(True):
+	# 		time.sleep(1)
 
+	def test_gt_pos(self):
+		nav = Nav()
+		nav.start()
+		nav.getPathTo(2)
+		while(True):
+			nav.getPos()
+			time.sleep(1)
+
+	"""
 	def test_prakash_path(self):
 		nav = Nav()
 		injection = nav.__dict__['_Nav__model']
 
 		## Direct dependency injection, to override server stuff.
 		## This is used to reduce dependency on server for testing.
-		pointList = [Point.fromParam(0,1260,0, 0)
-					, Point.fromParam(1420,1260,0, 0)
-					, Point.fromParam(1420,1440,0, 0)
+		pointList = [Point.fromParam(0, 2558,0, 0)
+					, Point.fromParam(2152,2558,0, 0)
 		]
 		path = Path.fromPoints(list(pointList))
 		injection['path'] = path
@@ -41,23 +56,29 @@ class NavTestCase(TestCase):
 		nav.resetMap()
 		nav.updateMap()
 
+		print '-----------------PING--------------'
+		injection['currLoc'] = Point.fromParam(0,2558,0, 0)
+		nav.tick(debug=True)
+		print '-----------------PING--------------'
 
 		## Do direct dependency injection
 		print '-----------------PING--------------'
-		injection['currLoc'] = Point.fromParam(0,1260,0, 0)
+		injection['currLoc'] = Point.fromParam(5,2558,0, 0)
+		nav.tick(debug=True)
+		print '-----------------PING--------------'
+
+		while (True):
+			pass
+			time.sleep(1)
+
+		print '-----------------PING--------------'
+		injection['currLoc'] = Point.fromParam(0,2558,0, 0)
 		nav.tick(debug=True)
 		print '-----------------PING--------------'
 
 
-		print '-----------------PING--------------'
-		injection['currLoc'] = Point.fromParam(1420,1260,0, 0)
-		nav.tick(debug=True)
-		print '-----------------PING--------------'
 
-		print '-----------------PING--------------'
-		injection['currLoc'] = Point.fromParam(1420,1440,0, 0)
-		nav.tick(debug=True)
-		print '-----------------PING--------------'
+
 
 		print path.get()
 
@@ -220,3 +241,4 @@ class NavTestCase(TestCase):
 	# 	bla = Nav(None)
 	# 	expect(bla.area()).to_equal(5)
 
+"""

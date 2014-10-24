@@ -5,6 +5,7 @@ import logging
 
 from numpy import linalg
 from math import fmod
+import angles
 import numpy
 
 class Point(object):
@@ -37,7 +38,7 @@ class Point(object):
 		"""
 		self.__model = {
 			"loc" : inputDict["loc"],
-			"orientation" : inputDict["orientation"],
+			"orientation" : self.normalizeRad(inputDict["orientation"]),
 			"name" : inputDict["name"],
 			"SUID" : inputDict["SUID"],
 			"id" : inputDict["id"]
@@ -45,6 +46,11 @@ class Point(object):
 
 		# super(Point, self).__init__()
 		return
+
+
+	def normalizeRad(self, value):
+		deg = angles.r2d(value)
+		return angles.d2r(angles.normalize(deg, -180, 180))
 
 
 	@classmethod
@@ -256,16 +262,23 @@ class Point(object):
 
 
 
-	def feedback(self, targetPt, thresholdDist, thresholdAngle):
+	def feedback(self, targetPt, thresholdDist, thresholdAngle, thresholdDistToPt=100):
 		""" Returns feedback for route.
 		Orientation takes precedence over distance to target, hence 
 		this will be corrected first.
+
+		@param thresholdDistToPt: how near is considered near to point
 		"""
 		response = {
 			"status": Point.FAR,
 			"distance": self.distTo(targetPt),
 			"angleCorrection": self.angleDiff(targetPt)
 		}
+
+		## If near point, say point has been reached 
+		if ( self.near(targetPt, thresholdDistToPt) is Point.REACHED ):
+			response["status"] = Point.REACHED
+			return response
 
 		turningCorrection = self.angleNear(targetPt, thresholdAngle)
 

@@ -209,6 +209,7 @@ class Nav(object):
 		"""
 		r = requests.get(Nav.HOST_ADDR + '/heartbeat/location')
 		self.__model['currLoc'] = Point.fromJson(r.text)
+		logging.info(self.__model['currLoc'])
 
 
 	def getPathTo(self, pointId):
