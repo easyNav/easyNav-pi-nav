@@ -23,7 +23,7 @@ class Nav(object):
 
 	# HOST_ADDR = "http://localhost:1337"
 	HOST_ADDR = "http://192.249.57.162:1337"
-	THRESHOLD_DIST = 1000
+	THRESHOLD_DIST = 100
 	THRESHOLD_ANGLE = 5 * 0.0174532925
 
 	## Run Levels here
@@ -36,7 +36,7 @@ class Nav(object):
 
 		self.runLevel = Nav.RUNLVL_NORMAL
 		## Sets the run interval, in terms of number of seconds
-		self.RUN_INTERVAL = 5
+		self.RUN_INTERVAL = 3
 
 		########## Private vars ##########
 		self.__model = {
@@ -221,6 +221,7 @@ class Nav(object):
 		self.__model['path'] = Path.fromString(r.text)
 		self._dispatcherClient.send(9002, 'say', {'text': 'Retrieved new path.'})
 		self._hasPassedStart = False # Variable to test if start pt has passed
+		self.achievedNode = -1 # Variable to test if previous point was the SAME point!!
 		logging.info('Retrieved new path.')
 
 
@@ -245,7 +246,7 @@ class Nav(object):
 		if path == None:
 			return
 		logging.debug('Point: %s' % pt)
-		logging.debug('Current target: %s' % path.get())
+		logging.debug('>>>>>> Current target: %s' % path.get())
 		feedback = path.isOnPath(pt, self.THRESHOLD_DIST, self.THRESHOLD_ANGLE)
 
 		status = feedback['status']
@@ -281,11 +282,20 @@ class Nav(object):
 
 			if (path.isAtDest() is False): 
 
-				if (self._hasPassedStart == False):
+
+				if ((self._hasPassedStart == False) and (self.__model['path'].ref == 0)):
 					self.__model['path'].next()
 					self._hasPassedStart = True # So this does not trigger again at start
+					self.achievedNode = 0
 
-				# print ('--------------------------' + self.__model['path'].nodes)
+				# elif ( (self.__model['path'].ref != 0) and (self.achievedNode == int(self.__model['path'].ref - 1)) ):
+				else:
+					if (self.achievedNode == (self.__model['path'].ref - 1)):
+						self.achievedNode = self.__model['path'].ref # Update to current node before incrementing
+						self.__model['path'].next()
+
+				## Store the last value, i.e. 'delay'
+
 				self._dispatcherClient.send(9002, 'say', {'text': 'Checkpoint reached!'})
 				logging.debug('checkpoint reached!')
 			else:
@@ -325,6 +335,11 @@ class Nav(object):
 			logging.warn('Oops, did we account for all feedback flags?')
 			pass
 		pass
+
+		print ('--------------curr node--------', self.__model['path'].ref)
+
+		print 'VAL ACHIEVED--------------------', self.achievedNode
+		print 'VAL TARGETED--------------------', self.__model['path'].ref
 
 
 	def exeLevelWarnObstacle(self):

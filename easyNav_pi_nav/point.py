@@ -8,6 +8,8 @@ from math import fmod
 import angles
 import numpy
 
+MAX_PATH_DISTANCE = 1000
+
 class Point(object):
 
 
@@ -175,7 +177,8 @@ class Point(object):
 		theta = 0.0 				## init as float
 
 		cX = loc_b['x'] - loc_a['x']
-		cY = loc_b['y'] - loc_a['y']
+		## TODO REMOVED Y VAL HERE
+		cY = loc_a['y'] - loc_b['y']
 
 		# This means point is very near; do not bother!!
 		if (cX == cY == 0):
@@ -184,6 +187,7 @@ class Point(object):
 
 		# Watch for dividing by 0 case
 		if (cY == 0):
+			print 'TRIGGERED Y0000000000000000000000000'
 			if (cX >= 0): 
 				theta = numpy.pi / 2
 				return theta
@@ -193,6 +197,7 @@ class Point(object):
 
 		## Fix faulty case where difference in X coords is 0.
 		if (cX == 0):
+			print 'TRIGGERED X0000000000000000000000000'
 			if (cY >= 0): 
 				theta = numpy.pi
 				return theta
@@ -251,13 +256,13 @@ class Point(object):
 		""" Determines if point orientation is aligned to target 
 		"""
 		angleCorrection = self.angleDiff(targetPt)
-		logging.debug(angleCorrection)
+		logging.debug('ANGLE CORRECTION============:::%s' % angleCorrection)
 		if (angleCorrection < (-threshold) ):
 			##TODO: >>>> Changed here
-			return Point.TURN_RIGHT
+			return Point.TURN_LEFT
 		elif (threshold < angleCorrection):
 			##TODO: >>>> Changed here
-			return Point.TURN_LEFT
+			return Point.TURN_RIGHT
 		else:
 			return Point.ALIGNED
 		pass
@@ -285,9 +290,11 @@ class Point(object):
 		turningCorrection = self.angleNear(targetPt, thresholdAngle)
 
 		if (turningCorrection is Point.TURN_RIGHT):
+			print('triggered!!!!!!!!!!!!!!!!!!!!!!!!!!!!! RIGHT')
 			response["status"] = Point.TURN_RIGHT
 
 		elif (turningCorrection is Point.TURN_LEFT):
+			print('triggered!!!!!!!!!!!!!!!!!!!!!!!!!!!!! LEFT')
 			response["status"] = Point.TURN_LEFT
 
 		elif ( self.near(targetPt, thresholdDist) is Point.FAR):
@@ -373,7 +380,7 @@ class Point(object):
 		if point1.isEqualXYZ(point2):
 			return -1
 		## Check distance from path.  If too far, then is off track.
-		if (self.nearPath(point1, point2, thresholdDist) == False):
+		if (self.nearPath(point1, point2, MAX_PATH_DISTANCE) == False):
 			return {
 				"status": Point.OUT_OF_PATH,
 				"distance": self.distTo(point2),
