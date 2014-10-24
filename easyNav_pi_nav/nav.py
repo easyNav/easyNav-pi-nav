@@ -112,8 +112,8 @@ class Nav(object):
 		@smokesignal.on('newPath')
 		def onNewPath(args):
 			logging.debug('Event triggered: Request for new path.')
-			nodeFrom = args.get('from')
-			nodeTo = args.get('to')
+			nodeFrom = json.loads(args.get('payload')).get('from')
+			nodeTo = json.loads(args.get('payload')).get('to')
 			if ((nodeTo == None) or (nodeFrom == None)):
 				logging.error('Received no start / end nodes')
 				return

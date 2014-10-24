@@ -49,7 +49,7 @@ class Point(object):
 
 
 	def normalizeRad(self, value):
-		deg = angles.r2d(value)
+		deg = angles.r2d(float(value))
 		return angles.d2r(angles.normalize(deg, -180, 180))
 
 

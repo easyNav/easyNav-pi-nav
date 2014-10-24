@@ -35,6 +35,7 @@ class NavTestCase(TestCase):
 	def test_gt_pos(self):
 		nav = Nav()
 		nav.start()
+		requests.post('http://192.249.57.162:1337/heartbeat/location?x=0&y=2436&z=0&orientation=7.85')
 		nav.getPathTo(2)
 		while(True):
 			nav.getPos()
