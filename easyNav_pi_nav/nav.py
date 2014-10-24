@@ -23,7 +23,7 @@ class Nav(object):
 
 	HOST_ADDR = "http://localhost:1337"
 	THRESHOLD_DIST = 50
-	THRESHOLD_ANGLE = 15 * 0.0174532925
+	THRESHOLD_ANGLE = 5 * 0.0174532925
 
 	## Run Levels here
 	RUNLVL_NORMAL = 0
