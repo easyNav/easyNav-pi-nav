@@ -253,8 +253,10 @@ class Point(object):
 		angleCorrection = self.angleDiff(targetPt)
 		logging.debug(angleCorrection)
 		if (angleCorrection < (-threshold) ):
+			##TODO: >>>> Changed here
 			return Point.TURN_RIGHT
 		elif (threshold < angleCorrection):
+			##TODO: >>>> Changed here
 			return Point.TURN_LEFT
 		else:
 			return Point.ALIGNED
@@ -282,11 +284,11 @@ class Point(object):
 
 		turningCorrection = self.angleNear(targetPt, thresholdAngle)
 
-		if (turningCorrection is Point.TURN_LEFT):
-			response["status"] = Point.TURN_LEFT
-
-		elif (turningCorrection is Point.TURN_RIGHT):
+		if (turningCorrection is Point.TURN_RIGHT):
 			response["status"] = Point.TURN_RIGHT
+
+		elif (turningCorrection is Point.TURN_LEFT):
+			response["status"] = Point.TURN_LEFT
 
 		elif ( self.near(targetPt, thresholdDist) is Point.FAR):
 			response["status"] = Point.MOVE_FORWARD

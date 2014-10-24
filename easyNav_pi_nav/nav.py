@@ -23,7 +23,7 @@ class Nav(object):
 
 	# HOST_ADDR = "http://localhost:1337"
 	HOST_ADDR = "http://192.249.57.162:1337"
-	THRESHOLD_DIST = 50
+	THRESHOLD_DIST = 1000
 	THRESHOLD_ANGLE = 5 * 0.0174532925
 
 	## Run Levels here
@@ -220,6 +220,7 @@ class Nav(object):
 		r = requests.get(Nav.HOST_ADDR + '/map/goto/' + str(pointId))
 		self.__model['path'] = Path.fromString(r.text)
 		self._dispatcherClient.send(9002, 'say', {'text': 'Retrieved new path.'})
+		self._hasPassedStart = False # Variable to test if start pt has passed
 		logging.info('Retrieved new path.')
 
 
@@ -279,7 +280,11 @@ class Nav(object):
 			##TODO: Implement print to voice
 
 			if (path.isAtDest() is False): 
-				self.__model['path'].next()
+
+				if (self._hasPassedStart == False):
+					self.__model['path'].next()
+					self._hasPassedStart = True # So this does not trigger again at start
+
 				# print ('--------------------------' + self.__model['path'].nodes)
 				self._dispatcherClient.send(9002, 'say', {'text': 'Checkpoint reached!'})
 				logging.debug('checkpoint reached!')
