@@ -53,7 +53,8 @@ easyNav Pi Nav daemon
         # add your dependencies here
         # remember to use 'package-name>=x.y.z,<x.y+1.0' notation (this way you get bugfixes)
         'smokesignal>=0.5',
-        'easyNav-pi-dispatcher>=0.1.2'
+        'easyNav-pi-dispatcher>=0.1.2',
+        'angles>=1.1'
     ],
     extras_require={
         'tests': tests_require,
