@@ -141,6 +141,26 @@ class Nav(object):
 			self.collisionLocked = True
 
 
+		@smokesignal.on('point')
+		def onPoint(args):
+			"""Update location based on interprocess posting
+			by cruncher
+			"""
+			locInfo = json.loads(args.get('payload'))
+			x = locInfo.get('x')
+			y = locInfo.get('y')
+			z = locInfo.get('z')
+			angle = locInfo.get('ang')
+			self.__model['currLoc'] = Point.fromParam(
+				x=x, 
+				y=y,
+				z=z, 
+				orientation=angle)
+			logging.info(
+				'[ NAV ] Internal pos is currently: (x=%s y=%s z=%s ang=%s)' % 
+				(x,y,z,angle) )
+
+
 	def setPosByXYZ(self, x=0, y=0, z=0, orientation=0):
 		""" Set position by XYZ 
 		"""
@@ -159,7 +179,7 @@ class Nav(object):
 		"""Set position on server, by SUID
 		"""
 		## Get the current old values (orientation workaround)
-		self.getPos()
+		# self.getPos()
 		orientation = 0
 		# orientation = (self.__model['currLoc'])['orientation']
 		### TODO: Fix orientation bug
@@ -204,15 +224,6 @@ class Nav(object):
 		logging.info('Map updated with building ' + building + ' at floor ' + floor)
 
 
-	def getPos(self):
-		"""Gets the position from server, and updates internal 
-		coordinates in Nav module.
-		"""
-		r = requests.get(Nav.HOST_ADDR + '/heartbeat/location')
-		self.__model['currLoc'] = Point.fromJson(r.text)
-		logging.info(self.__model['currLoc'])
-
-
 	def getPathTo(self, pointId):
 		"""Gets shortest path from point from current location, and updates internal
 		path accordingly.
@@ -220,9 +231,15 @@ class Nav(object):
 		r = requests.get(Nav.HOST_ADDR + '/map/goto/' + str(pointId))
 		self.__model['path'] = Path.fromString(r.text)
 		self._dispatcherClient.send(9002, 'say', {'text': 'Retrieved new path.'})
+		self._resetNavParams()
+		logging.info('Retrieved new path.')
+
+
+	def _resetNavParams(self):
+		"""Reset nav flags and relevant info. 
+		"""
 		self._hasPassedStart = False # Variable to test if start pt has passed
 		self.achievedNode = -1 # Variable to test if previous point was the SAME point!!
-		logging.info('Retrieved new path.')
 
 
 	def path(self):
@@ -336,10 +353,10 @@ class Nav(object):
 			pass
 		pass
 
-		print ('--------------curr node--------', self.__model['path'].ref)
+		# print ('--------------curr node--------', self.__model['path'].ref)
 
-		print 'VAL ACHIEVED--------------------', self.achievedNode
-		print 'VAL TARGETED--------------------', self.__model['path'].ref
+		# print 'VAL ACHIEVED--------------------', self.achievedNode
+		# print 'VAL TARGETED--------------------', self.__model['path'].ref
 
 
 	def exeLevelWarnObstacle(self):
@@ -368,7 +385,7 @@ class Nav(object):
 			debug: If False, do not not update position from server 
 			Instead do dependency injection manually.
 		"""
-		self.getPos() if (debug is False) else True
+		# self.getPos() if (debug is False) else True
 		self.feedbackCorrection()
 		pass
 

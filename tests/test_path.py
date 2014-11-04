@@ -23,7 +23,6 @@ class PathTestCase(TestCase):
 
 	@classmethod
 	def setup_class(cls):
-
 		r = requests.get('http://localhost:1337/edge/deleteAll') 
 		r = requests.get('http://localhost:1337/node/deleteAll') 
 		logging.info('Cleared server map redundant fixtures.')
@@ -113,10 +112,10 @@ class PathTestCase(TestCase):
 
 	def test_if_current_point_is_on_path(self):
 		pointList = [Point.fromParam(100,0,0)
-					, Point.fromParam(100,100,0)
-					, Point.fromParam(100,200,0)
-					, Point.fromParam(100,300,0)
-					, Point.fromParam(100,400,0)
+					, Point.fromParam(100,1000,0)
+					, Point.fromParam(100,2000,0)
+					, Point.fromParam(100,3000,0)
+					, Point.fromParam(100,4000,0)
 		]
 
 		thresholdDist = 50
@@ -130,11 +129,11 @@ class PathTestCase(TestCase):
 
 		pt = Point.fromParam(200,0,0, 0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_RIGHT)
+		expect(feedback).to_equal(Point.TURN_LEFT)
 
 		pt = Point.fromParam(0,0,0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_LEFT)
+		expect(feedback).to_equal(Point.TURN_RIGHT)
 
 		pt = Point.fromParam(0,0,0, pi / 2)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
@@ -146,42 +145,46 @@ class PathTestCase(TestCase):
 		## only turning error is reported.
 		pt = Point.fromParam(20000,0,0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_RIGHT)
+		expect(feedback).to_equal(Point.TURN_LEFT)
 		# expect(feedback).to_equal(Point.OUT_OF_PATH)
 
 
 		path.next()
 
-		pt = Point.fromParam(100,100,0)
-		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.REACHED)
 
+		## TODO: Remove this, since in new version, reaching a point will advance 
+		##       node
 		pt = Point.fromParam(110,100,0, 0)
-		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_RIGHT)
-
-		pt = Point.fromParam(90,100,0)
-		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_LEFT)
-
-		pt = Point.fromParam(50, 50,0, pi - (pi / 4))
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
 		expect(feedback).to_equal(Point.MOVE_FORWARD)
 
-		## Checking with respect to different orientation
-
-		pt = Point.fromParam(110,100,0, pi)
-		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_LEFT)
-
-		pt = Point.fromParam(90,50, 0, pi / 2)
-		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
-		expect(feedback).to_equal(Point.TURN_LEFT)
-
-		pt = Point.fromParam(90,150, 0, pi / 2)
+		pt = Point.fromParam(90,100,0)
 		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
 		expect(feedback).to_equal(Point.TURN_RIGHT)
 
+		pt = Point.fromParam(500, 500,0, pi - (pi / 4))
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_LEFT)
+
+		## Checking with respect to different orientation
+
+		pt = Point.fromParam(110,1000,0, pi)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.REACHED)
+
+		path.next()
+
+		pt = Point.fromParam(90,5000, 0, pi / 2)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_RIGHT)
+
+		pt = Point.fromParam(90,1500, 0, pi / 2)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.TURN_LEFT)
+
+		pt = Point.fromParam(100,1000,0)
+		feedback = path.isOnPath(pt, thresholdDist, thresholdAngle)['status']
+		expect(feedback).to_equal(Point.MOVE_FORWARD)
 
 
 

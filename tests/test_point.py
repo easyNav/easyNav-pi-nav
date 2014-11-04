@@ -21,31 +21,34 @@ class NavTestCase(TestCase):
 
 	@classmethod
 	def setup_class(cls):
+		## TODO: Remove below server dependency legacy code 
+		# r = requests.get('http://localhost:1337/edge/deleteAll') 
+		# r = requests.get('http://localhost:1337/node/deleteAll') 
+		# logging.info('Cleared server map redundant fixtures.')
 
-		r = requests.get('http://localhost:1337/edge/deleteAll') 
-		r = requests.get('http://localhost:1337/node/deleteAll') 
-		logging.info('Cleared server map redundant fixtures.')
+		# r = requests.get('http://localhost:1337/map/update') 
+		# expect(r.status_code).to_equal(200)
+		# logging.info('Populated server map fixtures.')
 
-		r = requests.get('http://localhost:1337/map/update') 
-		expect(r.status_code).to_equal(200)
-		logging.info('Populated server map fixtures.')
+		# r = requests.get('http://localhost:1337/node/?SUID=1') 
+		# testStr = r.text
+		# cls.pt = Point.fromJson(testStr)
+		# logging.info('Generated new point.')
 
-		r = requests.get('http://localhost:1337/node/?SUID=1') 
-		testStr = r.text
-		cls.pt = Point.fromJson(testStr)
-		logging.info('Generated new point.')
-
-		r2 = requests.get('http://localhost:1337/node/?SUID=3') 
-		testStr2 = r2.text
-		cls.pt2 = Point.fromJson(testStr2)
+		# r2 = requests.get('http://localhost:1337/node/?SUID=3') 
+		# testStr2 = r2.text
+		# cls.pt2 = Point.fromJson(testStr2)
+		cls.pt = Point.fromParam(x=0, y=2436, z=0, orientation=0)
+		cls.pt2 = Point.fromParam(x=2152, y=731, z=0, orientation=0)
+		logging.info('Generated mock points.')
 		pass
 
 	@classmethod
 	def teardown_class(cls):
-		r = requests.get('http://localhost:1337/edge/deleteAll') 
-		r = requests.get('http://localhost:1337/node/deleteAll') 
-		expect(r.status_code).to_equal(200)
-		logging.info('Cleared server map fixtures.')
+		# r = requests.get('http://localhost:1337/edge/deleteAll') 
+		# r = requests.get('http://localhost:1337/node/deleteAll') 
+		# expect(r.status_code).to_equal(200)
+		# logging.info('Cleared server map fixtures.')
 		pass
 
 	def setup(self):
@@ -106,7 +109,7 @@ class NavTestCase(TestCase):
 	def test_feedback_correction_is_working(self):
 		thresholdDist, thresholdAngle  = 10, 0.17453
 		feedback = self.pt.feedback(self.pt2, thresholdDist, thresholdAngle)
-		expect(feedback['status']).to_equal(Point.TURN_LEFT)
+		expect(feedback['status']).to_equal(Point.TURN_RIGHT)
 
 	def test_distance_to_line_path_works(self):
 		"""Determines distance of point from pathway between 2 lines

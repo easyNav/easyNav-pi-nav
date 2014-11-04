@@ -37,14 +37,14 @@ class NavTestCase(TestCase):
 
 	def test_can_get_position(self):
 		nav = Nav()
-		nav.getPos()
+		# nav.getPos()
 		expect(type(nav.loc()) is Point).to_equal(True)
 
 
 	def test_can_set_position_by_suid(self):
 		nav = Nav()
 		nav.setPosBySUID(3)
-		nav.getPos()
+		# nav.getPos()
 		logging.debug(nav.loc())
 		## TODO write assertions for this
 
@@ -61,6 +61,9 @@ class NavTestCase(TestCase):
 		print nav.path()
 
 
+	## DEPRECATED, AND VALUES OUTDATED.  USE GUI TO CHECK FOR 
+	## ACCURACY. 
+	"""
 	def test_feedback_works(self):
 		nav = Nav()
 		injection = nav.__dict__['_Nav__model']
@@ -76,8 +79,12 @@ class NavTestCase(TestCase):
 		path = Path.fromPoints(pointList)
 		injection['path'] = path
 
+
 		nav.resetMap()
 		nav.updateMap()
+
+		## Dependency injection to reset path
+		nav._resetNavParams()
 
 		## Do direct dependency injection
 		injection['currLoc'] = Point.fromParam(0,0,0, 0)
@@ -120,6 +127,7 @@ class NavTestCase(TestCase):
 
 		injection['currLoc'] = Point.fromParam(100,400,0)
 		nav.tick(debug=True)
+	"""
 
 
 	def test_can_run_as_daemon(self):
@@ -179,12 +187,55 @@ class NavTestCase(TestCase):
 		client.start()
 		client.send(9001, 'obstacle', {"status" : "0"})
 
-		print 'DONE--------------------------------------'
-		while(True):
-			time.sleep(5)
+		time.sleep(5)
 
 		## Keep daemons alive for 5 seconds.
 		time.sleep(10)
+
+		client.stop()
+		nav.stop()
+		logging.info('---finished event test---')
+
+
+	def test_daemon_update_pos_from_cruncher_event(self):
+		logging.info('')
+		logging.info('---started event test---')
+
+		## Setup Nav daemon
+		nav = Nav()
+		nav.start()
+		loc = nav.loc() # get current location as a point
+		x,y,z,angle = loc.getLocTuple()
+
+		expect(x).to_equal(0)
+		expect(y).to_equal(0)
+		expect(z).to_equal(0)
+		expect(angle).to_equal(0)
+
+		# Wait for 2 seconds to set-up
+		time.sleep(2)
+
+		## Setup mock cruncher
+		client = DispatcherClient(port=9004)
+		client.start()
+		client.send(9001, 'point', {
+			"x": 10, 
+			"y": 123, 
+			"z": 456, 
+			"ang": 1, 
+		})
+
+		# Wait for 5 seconds to propagate
+		startTime = time.time()
+		while(time.time() - startTime < 5):
+			time.sleep(0.01)
+			
+		loc = nav.loc() # get current location as a point
+		x,y,z,angle = loc.getLocTuple()
+		expect(x).to_equal(10)
+		expect(y).to_equal(123)
+		expect(z).to_equal(456)
+		expect(angle).to_equal(1)
 
 		client.stop()
 		nav.stop()

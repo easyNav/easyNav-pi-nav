@@ -55,6 +55,18 @@ class Point(object):
 		return angles.d2r(angles.normalize(deg, -180, 180))
 
 
+	def getLocTuple(self):
+		"""Return position and angle information as a tuple. 
+		"""
+		loc = self.__model['loc']
+		logging.debug(loc)
+		x = loc['x']
+		y = loc['y']
+		z = loc['z']
+		angle = self.__model['orientation']
+		return (x,y,z,angle)
+
+
 	@classmethod
 	def fromParam(cls, x=0, y=0, z=0, orientation=0, name="", suid="", id=""):
 		""" Easy method to create points for testing.
