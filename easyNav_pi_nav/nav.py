@@ -168,11 +168,14 @@ class Nav(object):
 		_y = str(y)
 		_z = str(z)
 		_orientation = str(orientation)
-		r = requests.post(Nav.HOST_ADDR 
-			+ '/heartbeat/location/?x=' + _x
-			+ '&y=' + _y
-			+ '&z=' + _z
-			+ '&orientation=' + _orientation)
+		try:
+			r = requests.post(Nav.HOST_ADDR 
+				+ '/heartbeat/location/?x=' + _x
+				+ '&y=' + _y
+				+ '&z=' + _z
+				+ '&orientation=' + _orientation)
+		except requests.exceptions.RequestException as e:
+			logging.error('Oops!  Failed to set position by XYZ. Error: %s' % e)
 
 
 	def setPosBySUID(self, suid=0):
@@ -185,7 +188,11 @@ class Nav(object):
 		### TODO: Fix orientation bug
 
 		## Get the SUID coordinates
-		r = requests.get(Nav.HOST_ADDR + '/node/?SUID=' + str(suid))
+		try:
+			r = requests.get(Nav.HOST_ADDR + '/node/?SUID=' + str(suid))
+		except requests.exceptions.RequestException as e:
+			logging.error('Oops!  Failed to set position by SUID. Error: %s' % e)
+
 		response = json.loads(r.text)
 
 
@@ -205,34 +212,47 @@ class Nav(object):
 	def resetMap(self):
 		"""Resets the map.
 		"""
-		r = requests.delete(Nav.HOST_ADDR + '/map')
-		logging.info('Map deleted.')
+		try:
+			r = requests.delete(Nav.HOST_ADDR + '/map')
+			logging.info('Map deleted.')
+		except requests.exceptions.RequestException as e:
+			logging.error('Oops!  Failed to delete map.  Is server connected?')
 
 
 	def updateMap(self):
 		"""Updates the map on server. 
 		"""
-		r = requests.get(Nav.HOST_ADDR + '/map/update')
-		# self._dispatcherClient.send(9002, 'say', {'text': 'Map updated.'})
-		logging.info('Map updated.')
+		try:
+			r = requests.get(Nav.HOST_ADDR + '/map/update')
+			# self._dispatcherClient.send(9002, 'say', {'text': 'Map updated.'})
+			logging.info('Map updated.')
+		except requests.exceptions.RequestException as e:
+			logging.error('Oops!  Failed to update map.  Is server connected?')
+
 
 	def updateMapCustom(self, building, floor):
 		"""Updates the map on server, with floor and building name.
 		"""
-		r = requests.get(Nav.HOST_ADDR + '/map/update?floor=' + floor + '&building=' + building)
-		# self._dispatcherClient.send(9002, 'say', {'text': 'Map updated.'})
-		logging.info('Map updated with building ' + building + ' at floor ' + floor)
+		try:
+			r = requests.get(Nav.HOST_ADDR + '/map/update?floor=' + floor + '&building=' + building)
+			# self._dispatcherClient.send(9002, 'say', {'text': 'Map updated.'})
+			logging.info('Map updated with building ' + building + ' at floor ' + floor)
+		except requests.exceptions.RequestException as e:
+			logging.error('Oops!  Failed to update map building=%s floor=%s.  Is server connected?' % (building, floor))
 
 
 	def getPathTo(self, pointId):
 		"""Gets shortest path from point from current location, and updates internal
 		path accordingly.
 		"""
-		r = requests.get(Nav.HOST_ADDR + '/map/goto/' + str(pointId))
-		self.__model['path'] = Path.fromString(r.text)
-		self._dispatcherClient.send(9002, 'say', {'text': 'Retrieved new path.'})
-		self._resetNavParams()
-		logging.info('Retrieved new path.')
+		try:
+			r = requests.get(Nav.HOST_ADDR + '/map/goto/' + str(pointId))
+			self.__model['path'] = Path.fromString(r.text)
+			self._dispatcherClient.send(9002, 'say', {'text': 'Retrieved new path.'})
+			self._resetNavParams()
+			logging.info('Retrieved new path.')
+		except requests.exceptions.RequestException as e:
+			logging.info('Oops!  Failed to retrieve shortest path.  Is server connected?')
 
 
 	def _resetNavParams(self):
