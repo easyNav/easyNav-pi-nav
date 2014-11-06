@@ -21,8 +21,8 @@ class Nav(object):
 	this class implements the REST API endpoints from the server. 
 	"""
 
-	# HOST_ADDR = "http://localhost:1337"
-	HOST_ADDR = "http://192.249.57.162:1337"
+	HOST_ADDR = "http://localhost:1337"
+	# HOST_ADDR = "http://192.249.57.162:1337"
 	THRESHOLD_DIST = 100
 	THRESHOLD_ANGLE = 10 * 0.0174532925
 
