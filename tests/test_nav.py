@@ -23,6 +23,12 @@ from easyNav_pi_nav import Nav, Point, Path
 
 
 class NavTestCase(TestCase):
+	
+	def setup(self):
+		pass
+
+	def teardown(self):
+		pass
 
 	def test_can_init(self):
 		bla = Nav()
@@ -43,6 +49,11 @@ class NavTestCase(TestCase):
 
 	def test_can_set_position_by_suid(self):
 		nav = Nav()
+		## Dependency injection ##
+		nav.resetMap()
+		nav.updateMap()
+		## /Dependency injection ##
+		# nav.RUNLVL_WARNING_OBSTACLE
 		nav.setPosBySUID(3)
 		# nav.getPos()
 		logging.debug(nav.loc())
@@ -168,33 +179,33 @@ class NavTestCase(TestCase):
 		logging.info('---finished event test---')
 
 
-	def test_can_avoid_collision(self):
-		logging.info('')
-		logging.info('---started event test---')
+	# def test_can_avoid_collision(self):
+	# 	logging.info('')
+	# 	logging.info('---started event test---')
 
-		## Setup Nav daemon
-		nav = Nav()
-		nav.start()
+	# 	## Setup Nav daemon
+	# 	nav = Nav()
+	# 	nav.start()
 
-		pointList = [Point.fromParam(100,0,0)
-					, Point.fromParam(100,200,0)
-		]
-		path = Path.fromPoints(pointList)
-		injection['path'] = path
+	# 	pointList = [Point.fromParam(100,0,0)
+	# 				, Point.fromParam(100,200,0)
+	# 	]
+	# 	path = Path.fromPoints(pointList)
+	# 	injection['path'] = path
 
-		## Setup collision info
-		client = DispatcherClient(port=9002)
-		client.start()
-		client.send(9001, 'obstacle', {"status" : "0"})
+	# 	## Setup collision info
+	# 	client = DispatcherClient(port=9002)
+	# 	client.start()
+	# 	client.send(9001, 'obstacle', {"status" : "0"})
 
-		time.sleep(5)
+	# 	time.sleep(5)
 
-		## Keep daemons alive for 5 seconds.
-		time.sleep(10)
+	# 	## Keep daemons alive for 5 seconds.
+	# 	time.sleep(10)
 
-		client.stop()
-		nav.stop()
-		logging.info('---finished event test---')
+	# 	client.stop()
+	# 	nav.stop()
+	# 	logging.info('---finished event test---')
 
 
 	def test_daemon_update_pos_from_cruncher_event(self):
@@ -242,37 +253,37 @@ class NavTestCase(TestCase):
 		logging.info('---finished event test---')
 
 		
-	def test_can_avoid_collision(self):
-		logging.info('')
-		logging.info('---started event test---')
+	# def test_can_avoid_collision(self):
+	# 	logging.info('')
+	# 	logging.info('---started event test---')
 
-		## Setup Nav daemon
-		nav = Nav()
-		nav.start()
+	# 	## Setup Nav daemon
+	# 	nav = Nav()
+	# 	nav.start()
 
-		pointList = [Point.fromParam(100,0,0)
-					, Point.fromParam(100,200,0)
-		]
-		path = Path.fromPoints(pointList)
-		injection = nav.__dict__['_Nav__model']
-		injection['path'] = path
+	# 	pointList = [Point.fromParam(100,0,0)
+	# 				, Point.fromParam(100,200,0)
+	# 	]
+	# 	path = Path.fromPoints(pointList)
+	# 	injection = nav.__dict__['_Nav__model']
+	# 	injection['path'] = path
 
-		## Setup collision info
-		client = DispatcherClient(port=9002)
-		client.start()
-		client.send(9001, 'obstacle', {"status" : "0"})
-		client.send(9001, 'obstacle', {"status" : "1"})
-		time.sleep(10)
-		client.send(9001, 'obstacle', {"status" : "0"})
+	# 	## Setup collision info
+	# 	client = DispatcherClient(port=9002)
+	# 	client.start()
+	# 	client.send(9001, 'obstacle', {"status" : "0"})
+	# 	client.send(9001, 'obstacle', {"status" : "1"})
+	# 	time.sleep(10)
+	# 	client.send(9001, 'obstacle', {"status" : "0"})
 
-		## Keep daemons alive for 5 seconds.
-		time.sleep(15)
+	# 	## Keep daemons alive for 5 seconds.
+	# 	time.sleep(15)
 
-		print('--------------------------')
+	# 	print('--------------------------')
 
-		client.stop()
-		nav.stop()
-		logging.info('---finished event test---')
+	# 	client.stop()
+	# 	nav.stop()
+	# 	logging.info('---finished event test---')
 
 
 

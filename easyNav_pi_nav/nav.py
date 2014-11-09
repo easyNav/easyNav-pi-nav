@@ -68,8 +68,8 @@ class Nav(object):
 		## Start inter-process comms
 		self._dispatcherClient.start()
 
-		self.resetMap()
-		self.updateMap()
+		# self.resetMap()
+		# self.updateMap()
 
 		def runThread():
 			while(self._active):
@@ -124,21 +124,21 @@ class Nav(object):
 			self.getPathTo(nodeTo)
 
 
-		@smokesignal.on('obstacle')
-		def onObstacle(args):
-			response = int(json.loads(args.get('payload')).get('status'))
-			if (response == 0):
-				self.obstacle = None
-				return # Do not set collision locked
-			elif (response == 1):
-				self.obstacle = 'FRONT'
-			elif (response == 2):
-				self.obstacle = 'LEFT'
-			elif (response == 3):
-				self.obstacle = 'RIGHT'
+		# @smokesignal.on('obstacle')
+		# def onObstacle(args):
+		# 	response = int(json.loads(args.get('payload')).get('status'))
+		# 	if (response == 0):
+		# 		self.obstacle = None
+		# 		return # Do not set collision locked
+		# 	elif (response == 1):
+		# 		self.obstacle = 'FRONT'
+		# 	elif (response == 2):
+		# 		self.obstacle = 'LEFT'
+		# 	elif (response == 3):
+		# 		self.obstacle = 'RIGHT'
 
-			# If collision, set to true
-			self.collisionLocked = True
+		# 	# If collision, set to true
+		# 	self.collisionLocked = True
 
 
 		@smokesignal.on('point')
