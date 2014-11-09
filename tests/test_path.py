@@ -31,7 +31,7 @@ class PathTestCase(TestCase):
 		expect(r.status_code).to_equal(200)
 		logging.info('Populated server map fixtures.')
 
-		cls.pathNodes = requests.get('http://localhost:1337/map/shortest/1/5').text
+		cls.pathNodes = requests.get('http://localhost:1337/map/shortest/121/125').text
 		pass
 
 	@classmethod

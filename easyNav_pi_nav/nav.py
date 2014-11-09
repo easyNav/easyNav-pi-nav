@@ -246,10 +246,10 @@ class Nav(object):
 		path accordingly.
 		"""
 		try:
+			self._resetNavParams()
 			r = requests.get(Nav.HOST_ADDR + '/map/goto/' + str(pointId))
 			self.__model['path'] = Path.fromString(r.text)
 			self._dispatcherClient.send(9002, 'say', {'text': 'Retrieved new path.'})
-			self._resetNavParams()
 			logging.info('Retrieved new path.')
 		except requests.exceptions.RequestException as e:
 			logging.info('Oops!  Failed to retrieve shortest path.  Is server connected?')
@@ -258,8 +258,9 @@ class Nav(object):
 	def _resetNavParams(self):
 		"""Reset nav flags and relevant info. 
 		"""
-		self._hasPassedStart = False # Variable to test if start pt has passed
-		self.achievedNode = -1 # Variable to test if previous point was the SAME point!!
+		self._hasPassedStart = False 	# Variable to test if start pt has passed
+		self.achievedNode = -1 			# Variable to test if previous point was the SAME point!!
+		self.__model['path'] = None 	# Reset path
 
 
 	def path(self):
@@ -336,7 +337,8 @@ class Nav(object):
 				self._dispatcherClient.send(9002, 'say', {'text': 'Checkpoint reached!'})
 				logging.debug('checkpoint reached!')
 			else:
-				self._dispatcherClient.send(9002, 'say', {'text': 'You have reached your destination!'})
+				self._dispatcherClient.send(9002, 'say', {'text': 'Destination reached!'})
+				self._resetNavParams() # Reset all navigation params and await new path
 				logging.debug('Reached destination, done!')
 			pass
 
