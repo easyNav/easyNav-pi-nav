@@ -74,7 +74,7 @@ class Nav(object):
 		def runThread():
 			while(self._active):
 				self.tick()
-				time.sleep(5)
+				time.sleep(self.RUN_INTERVAL)
 
 
 		self._threadListen = threading.Thread(target=runThread)
