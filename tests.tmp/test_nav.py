@@ -65,7 +65,7 @@ class NavTestCase(TestCase):
 		nav.resetMap()
 		nav.updateMap()
 		time.sleep(5)
-		nav.getPathTo('124', '1225')
+		nav.getPathTo('5')
 		expect(type(nav.path()) is Path).to_equal(True)
 
 		print '------RESPONSE---------'
@@ -168,8 +168,11 @@ class NavTestCase(TestCase):
 		## Setup client and send info
 		client = DispatcherClient(port=9002)
 		client.start()
-		client.send(9001, 'newPath', {"from" : "124", "to" : "125"})
+		client.send(9001, 'newPath', {"from" : "124", "to" : "1210"})
 		logging.info('Requested for new Path from 9002.')
+
+		while(True):
+			pass
 
 		## Keep daemons alive for 5 seconds.
 		time.sleep(5)

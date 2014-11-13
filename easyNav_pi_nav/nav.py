@@ -118,10 +118,13 @@ class Nav(object):
 				logging.error('Received no start / end nodes')
 				return
 
+			# DEPRECATED ------
 			## reset current location
-			self.setPosBySUID(str(nodeFrom))
+			# self.setPosBySUID(str(nodeFrom))
+			# /DEPRECATED ------
+
 			## Get new path
-			self.getPathTo(nodeTo)
+			self.getPathTo(nodeFrom, nodeTo)
 
 
 		# @smokesignal.on('obstacle')
@@ -241,13 +244,13 @@ class Nav(object):
 			logging.error('Oops!  Failed to update map building=%s floor=%s.  Is server connected?' % (building, floor))
 
 
-	def getPathTo(self, pointId):
+	def getPathTo(self, nodeFrom, nodeTo):
 		"""Gets shortest path from point from current location, and updates internal
 		path accordingly.
 		"""
 		try:
 			self._resetNavParams()
-			r = requests.get(Nav.HOST_ADDR + '/map/goto/' + str(pointId))
+			r = requests.get(Nav.HOST_ADDR + '/map/shortest/' + str(nodeFrom) + '/' + str(nodeTo) )
 			self.__model['path'] = Path.fromString(r.text)
 			self._dispatcherClient.send(9002, 'say', {'text': 'Retrieved new path.'})
 			logging.info('Retrieved new path.')
@@ -330,14 +333,15 @@ class Nav(object):
 				else:
 					if (self.achievedNode == (self.__model['path'].ref - 1)):
 						self.achievedNode = self.__model['path'].ref # Update to current node before incrementing
+						checkpointName = self.achievedNode.name()
 						self.__model['path'].next()
 
 				## Store the last value, i.e. 'delay'
 
-				self._dispatcherClient.send(9002, 'say', {'text': 'Checkpoint reached!'})
+				self._dispatcherClient.send(9002, 'say', {'text': 'Checkpoint ' + checkpointName + ' reached!'})
 				logging.debug('checkpoint reached!')
 			else:
-				self._dispatcherClient.send(9002, 'say', {'text': 'Destination reached!'})
+				self._dispatcherClient.send(9002, 'say', {'text': 'Destination ' + checkpointName + ' reached!'})
 				self._resetNavParams() # Reset all navigation params and await new path
 				logging.debug('Reached destination, done!')
 			pass
@@ -350,7 +354,9 @@ class Nav(object):
 		elif (status is Point.OUT_OF_PATH):
 			self._dispatcherClient.send(9002, 'say', {'text': 'Out of path!'})
 			logging.debug('Out of path!')
-			self.getPathTo( self.path().dest().name() )
+			## DEPRECATED --------------------------------
+			# self.getPathTo( self.path().dest().name() )
+			## /DEPRECATED --------------------------------
 			pass
 
 		elif (status is Point.ALIGNED):
