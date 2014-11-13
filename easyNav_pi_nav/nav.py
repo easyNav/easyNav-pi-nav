@@ -251,6 +251,8 @@ class Nav(object):
 		try:
 			self._resetNavParams()
 			r = requests.get(Nav.HOST_ADDR + '/map/shortest/' + str(nodeFrom) + '/' + str(nodeTo) )
+			logging.debug('Got path')
+			logging.debug(r.text)
 			self.__model['path'] = Path.fromString(r.text)
 			self._dispatcherClient.send(9002, 'say', {'text': 'Retrieved new path.'})
 			logging.info('Retrieved new path.')
