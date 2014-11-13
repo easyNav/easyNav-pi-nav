@@ -140,7 +140,11 @@ class Point(object):
 
 
 	def name(self):
-		return self.__model["name"]
+		name = self.__model.get('name')
+		if (name == None):
+			return '' # for safety
+		else:
+			return name
 
 
 	def suid(self):
