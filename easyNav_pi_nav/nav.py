@@ -328,7 +328,7 @@ class Nav(object):
 		""" Check for existence of path, and use that to detect 
 		isNavigating state 
 		"""
-		return !(path == None)
+		return not (path == None)
 
 
 	def exeLevelNorm(self):
