@@ -201,6 +201,15 @@ class Nav(object):
 			logging.debug('Nav is RESUMED.')
 
 
+		@smokesignal.on('checkNavigation')
+		def onPause(args):
+			""" Unpause navigation.  Useful for stairs / etc. 
+			"""
+			isNavigating = self.isNavigating()
+			self._dispatcherClient.send(9002, 'checkNavigation', {'isNavigating': isNavigating })
+			logging.debug('Nav state checked.')
+
+
 	def setPosByXYZ(self, x=0, y=0, z=0, orientation=0):
 		""" Set position by XYZ 
 		"""
@@ -313,6 +322,13 @@ class Nav(object):
 		""" Returns the current location of user, as a Point instance. 
 		"""
 		return self.__model['currLoc']
+
+
+	def isNavigating(self):
+		""" Check for existence of path, and use that to detect 
+		isNavigating state 
+		"""
+		return !(path == None)
 
 
 	def exeLevelNorm(self):
