@@ -59,12 +59,18 @@ class Nav(object):
 		self.collisionLocked = False
 		self.obstacle = None
 
+		## For pausing nav
+		self.toPause = False
+
 		logging.info('Nav Daemon running.')
 
 
 	def start(self):
 		""" Start the daemon and run persistently.  Auto-retrieves new map in starting. 
 		"""
+		## Disable pausing 
+		self.toPause = False
+
 		## Start inter-process comms
 		self._dispatcherClient.start()
 
@@ -72,9 +78,12 @@ class Nav(object):
 		# self.updateMap()
 
 		def runThread():
+			refTime = time.time()
 			while(self._active):
-				self.tick()
-				time.sleep(self.RUN_INTERVAL)
+				if ( (time.time() - refTime) > self.RUN_INTERVAL):
+					refTime = time.time()
+					self.tick()
+					time.sleep(0.01)
 
 
 		self._threadListen = threading.Thread(target=runThread)
@@ -162,6 +171,34 @@ class Nav(object):
 			logging.info(
 				'[ NAV ] Internal pos is currently: (x=%s y=%s z=%s ang=%s)' % 
 				(x,y,z,angle) )
+
+
+		@smokesignal.on('reset')
+		def onReset(args):
+			"""If navigation needs to be reset during routing, 
+			use this 
+			"""
+			self._dispatcherClient.send(9002, 'say', {'text': 'Nav reset.'})
+			self._resetNavParams() # Reset all navigation params and await new path
+			logging.debug('Nav has been RESET.')
+
+
+		@smokesignal.on('pause')
+		def onPause(args):
+			""" Pause navigation.  Useful for stairs / etc. 
+			"""
+			self.toPause = True
+			self._dispatcherClient.send(9002, 'say', {'text': 'Nav paused.'})
+			logging.debug('Nav is PAUSED.')
+
+
+		@smokesignal.on('unpause')
+		def onPause(args):
+			""" Unpause navigation.  Useful for stairs / etc. 
+			"""
+			self.toPause = False
+			self._dispatcherClient.send(9002, 'say', {'text': 'Nav resumed.'})
+			logging.debug('Nav is RESUMED.')
 
 
 	def setPosByXYZ(self, x=0, y=0, z=0, orientation=0):
@@ -415,9 +452,9 @@ class Nav(object):
 			debug: If False, do not not update position from server 
 			Instead do dependency injection manually.
 		"""
-		# self.getPos() if (debug is False) else True
-		self.feedbackCorrection()
-		pass
+		if (self.toPause == False):
+			self.feedbackCorrection()
+			# self.getPos() if (debug is False) else True
 
 
 
