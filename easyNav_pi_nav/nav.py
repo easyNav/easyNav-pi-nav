@@ -36,7 +36,7 @@ class Nav(object):
 
 		self.runLevel = Nav.RUNLVL_NORMAL
 		## Sets the run interval, in terms of number of seconds
-		self.RUN_INTERVAL = 3
+		self.RUN_INTERVAL = 2
 
 		########## Private vars ##########
 		self.__model = {
