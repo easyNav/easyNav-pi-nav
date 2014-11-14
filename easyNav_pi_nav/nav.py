@@ -396,8 +396,11 @@ class Nav(object):
 						self.__model['path'].next()
 
 				## Store the last value, i.e. 'delay'
+				if checkpointName == '':
+					self._dispatcherClient.send(9002, 'say', {'text': 'Checkpoint reached!'})
+				else:
+					self._dispatcherClient.send(9002, 'say', {'text': 'Checkpoint ' + checkpointName + ' reached!'})
 
-				self._dispatcherClient.send(9002, 'say', {'text': 'Checkpoint ' + checkpointName + ' reached!'})
 				logging.debug('checkpoint reached!')
 			else:
 				self._dispatcherClient.send(9002, 'say', {'text': 'Destination ' + checkpointName + ' reached!'})
