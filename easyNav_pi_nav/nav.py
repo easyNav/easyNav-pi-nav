@@ -372,7 +372,11 @@ class Nav(object):
 					if (self.achievedNode == (self.__model['path'].ref - 1)):
 						self.achievedNode = self.__model['path'].ref # Update to current node before incrementing
 						##TODO: Fix this tomorrow
-						# checkpointName = self.achievedNode.name()
+						try:
+							currNode = self.__model['path'].get() ## Get current node
+							checkpointName = currNode.name()
+						except:
+							logging.error('Oops.  Invalid name?')
 						self.__model['path'].next()
 
 				## Store the last value, i.e. 'delay'
