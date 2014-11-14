@@ -434,12 +434,12 @@ class Nav(object):
 			pass
 
 		elif (status is Point.TURN_LEFT):
-			self._dispatcherClient.send(9002, 'say', {'text': 'Turn left!'})
+			self._dispatcherClient.send(9002, 'say', {'text': 'Turn left ' + str(angleCorrection) + ' degrees' })
 			logging.debug('Turn left ' + str(angleCorrection) + ' degrees')
 			pass
 
 		elif (status is Point.TURN_RIGHT):
-			self._dispatcherClient.send(9002, 'say', {'text': 'Turn right!'})
+			self._dispatcherClient.send(9002, 'say', {'text': 'Turn right ' + str(angleCorrection) + ' degrees' })
 			logging.debug('Turn right ' + str(angleCorrection) + ' degrees')
 			pass
 
