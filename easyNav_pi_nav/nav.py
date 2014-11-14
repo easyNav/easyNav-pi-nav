@@ -168,9 +168,9 @@ class Nav(object):
 				y=y,
 				z=z, 
 				orientation=angle)
-			logging.info(
-				'[ NAV ] Internal pos is currently: (x=%s y=%s z=%s ang=%s)' % 
-				(x,y,z,angle) )
+			# logging.info(
+			# 	'[ NAV ] Internal pos is currently: (x=%s y=%s z=%s ang=%s)' % 
+			# 	(x,y,z,angle) )
 
 
 		@smokesignal.on('reset')
