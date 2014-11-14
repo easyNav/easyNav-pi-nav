@@ -349,7 +349,7 @@ class Nav(object):
 		feedback = path.isOnPath(pt, self.THRESHOLD_DIST, self.THRESHOLD_ANGLE)
 
 		status = feedback['status']
-		angleCorrection = angles.r2d(float(feedback['angleCorrection']))
+		angleCorrection = int(angles.r2d(float(feedback['angleCorrection'])))
 
 		## Collision detection first
 		if (self.collisionLocked):
