@@ -14,6 +14,11 @@ from easyNav_pi_nav import __version__
 from path import Path 
 from point import Point
 
+# Radian conversion
+from math import fmod
+import angles
+import numpy
+
 
 class Nav(object):
 	""" This is the Nav class, which handles navigation on the Raspberry Pi. 
@@ -344,6 +349,7 @@ class Nav(object):
 		feedback = path.isOnPath(pt, self.THRESHOLD_DIST, self.THRESHOLD_ANGLE)
 
 		status = feedback['status']
+		angleCorrection = angles.r2d(float(feedback['angleCorrection']))
 
 		## Collision detection first
 		if (self.collisionLocked):
@@ -429,12 +435,12 @@ class Nav(object):
 
 		elif (status is Point.TURN_LEFT):
 			self._dispatcherClient.send(9002, 'say', {'text': 'Turn left!'})
-			logging.debug('Turn left!')
+			logging.debug('Turn left ' + str(angleCorrection) + ' degrees')
 			pass
 
 		elif (status is Point.TURN_RIGHT):
 			self._dispatcherClient.send(9002, 'say', {'text': 'Turn right!'})
-			logging.debug('Turn right!')
+			logging.debug('Turn right ' + str(angleCorrection) + ' degrees')
 			pass
 
 		else:
