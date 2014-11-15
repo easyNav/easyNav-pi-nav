@@ -343,6 +343,7 @@ class Nav(object):
 		pt = self.loc()
 		## Return if no path set!
 		if path == None:
+			logging.debug('No path set.')
 			return
 		logging.debug('Point: %s' % pt)
 		logging.debug('>>>>>> Current target: %s' % path.get())
